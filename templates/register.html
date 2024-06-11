@@ -1,0 +1,12 @@
+{% extends 'layout.html' %} {% block body %}
+<h1>Please Register</h1>
+<br />
+<div class="container">
+    <form action="" method="post">
+        <input type="text" placeholder="Username" name="username" />
+        <input type="password" placeholder="Password" name="password" />
+        <input class="btn btn-default" type="submit" value="Register" />
+    </form>
+    {% for message in get_flashed_messages() %} {{ message }} {% endfor %}
+</div>
+{% endblock %}

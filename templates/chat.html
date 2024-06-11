@@ -1,0 +1,22 @@
+{% extends 'layout.html' %} {% block body %}
+<h1>{{ app_data['description'] }}</h1>
+<h2>Customer Chat Box</h2>
+<br />
+<h3>So far...</h3>
+{% for chat in chats %}
+<hr />
+<p>{{ chat['chat'] }}</p>
+<strong>Posted at:</strong> {{ chat['time'] }} <br />
+{% endfor %}
+<br />
+
+<h3>Make a chat</h3>
+<div class="container">
+    <form action="" method="post">
+        <textarea rows="4" cols="50" name="chat"></textarea>
+        <input class="btn btn-default" type="submit" value="Chat" />
+    </form>
+</div>
+<br />
+
+{% endblock %}
