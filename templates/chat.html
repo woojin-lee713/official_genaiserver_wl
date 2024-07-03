@@ -1,23 +1,50 @@
 {% extends 'layout.html' %} {% block body %}
-<div class="hero">
-    <h1>{{ app_data['description'] }}</h1>
-    <h2>Customer Chat Box</h2>
-</div>
-<div class="container">
-    <div class="chat-area">
-        <h3>So far...</h3>
-        {% for chat in chats %}
-        <hr />
-        <p>{{ chat['chat'] }}</p>
-        <strong>Posted at:</strong> {{ chat['time'] }} <br />
-        {% endfor %}
-        <br />
+<h1>{{ app_data['description'] }}</h1>
+<h2>Customer Chat Box</h2>
+<br />
+<h3>So far...</h3>
+{% for chat in chats %}
+<hr />
+<p>{{ chat['chat'] }}</p>
+<strong>Posted at:</strong> {{ chat['time'] }} <br />
+{% endfor %}
+<br />
 
-        <h3>Make a chat</h3>
-        <form action="" method="post">
-            <textarea rows="4" cols="50" name="chat"></textarea>
-            <input class="btn btn-default" type="submit" value="Chat" />
-        </form>
-    </div>
+<h3>Make a chat</h3>
+<div class="container">
+    <form id="chatForm">
+        <textarea rows="4" cols="50" name="chat" id="chatInput"></textarea>
+        <input
+            class="btn btn-default"
+            type="button"
+            value="Chat"
+            onclick="sendChat()"
+        />
+    </form>
 </div>
+<br />
+
+<h3>Responses:</h3>
+<div id="chatResponses"></div>
+
+<script>
+    async function sendChat() {
+        const chatInput = document.getElementById("chatInput").value;
+        const response = await fetch("/get_response", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ prompt: chatInput }),
+        });
+        const data = await response.json();
+        const chatResponses = document.getElementById("chatResponses");
+        if (data.response) {
+            chatResponses.innerHTML += "<p>" + data.response + "</p>";
+        } else {
+            chatResponses.innerHTML += "<p>Error: " + data.error + "</p>";
+        }
+    }
+</script>
+
 {% endblock %}

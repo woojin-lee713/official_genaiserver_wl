@@ -2,3 +2,4 @@
 .pixi
 *.db
 *.egg-info
+.env

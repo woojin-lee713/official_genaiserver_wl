@@ -1,21 +1,26 @@
-from flask import Flask, render_template
-from flask import redirect, url_for, request
-from flask import session, flash
-from flask import g
+from flask import Flask, render_template, redirect, url_for, request, session, flash, g, jsonify
 import sqlite3
 from datetime import datetime
-import sys
+from openai import OpenAI
+import os
+
+# Load environment variables from a .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 DEVELOPMENT_ENV = True
 
-# connect to database
+# Connect to database
 def connect_db():
     return sqlite3.connect('sample.db')
 
 app = Flask(__name__, template_folder='../templates')
 
-# config
-app.secret_key = 'my precious' # tell me you have seen Lord of The Rings
+# Config
+app.secret_key = 'my precious'
 app.database = 'sample.db'
 
 app_data = {
@@ -28,7 +33,8 @@ app_data = {
 }
 
 from functools import wraps
-# login required decorator
+
+# Login required decorator
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -39,11 +45,9 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
-
 @app.route("/")
 def index():
     return render_template("index.html", app_data=app_data)
-
 
 @app.route("/about")
 def about():
@@ -64,11 +68,25 @@ def chat():
         g.db.execute('INSERT INTO chats (user_id, model_id, chat, time) VALUES (?, ?, ?, ?)', (user_id, model_id, chat, thetime,))
         g.db.commit()
 
-    cur2 = g.db.execute('select * from chats WHERE user_id = ? ORDER BY time;', (user_id,))
+    cur2 = g.db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
     chats = [dict(time=row[4], chat=row[3]) for row in cur2.fetchall()]
     g.db.close()
     return render_template("chat.html", app_data=app_data, chats=chats)
 
+@app.route('/get_response', methods=['POST'])
+def get_response():
+    data = request.json
+    prompt = data.get('prompt', '')
+
+    try:
+        response = client.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        chat_text = response.choices[0].message.content
+        return jsonify({"response": chat_text})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 def lookup_user(username, password):
     g.db = connect_db()
@@ -78,7 +96,6 @@ def lookup_user(username, password):
     if lookedup_password != password:
         raise ValueError(f"Password does not match {lookedup_password}, {password}")
     return lookedup_username
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -95,7 +112,6 @@ def login():
             error = f"Invalid Credentials. {estr} Please try again. {request.form['username']}, {request.form['password']}"
     return render_template('login.html', app_data=app_data, error=error)
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -103,7 +119,6 @@ def logout():
     session.pop('username', None)
     flash('You were logged out.')
     return redirect(url_for('index'))
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -119,10 +134,8 @@ def register():
         return redirect(url_for('index'))
     return render_template('register.html', app_data=app_data)
 
-
 if __name__ == "__main__":
     app.run(debug=DEVELOPMENT_ENV)
-
 
 #Log in details
 #1. admin, admin
