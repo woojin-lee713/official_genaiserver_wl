@@ -1,13 +1,49 @@
-{% extends 'layout.html' %}
-
-{% block body %}
-<div class="jumbotron">
-    <h1 class="display-4">Customer Service App by {{ app_data['author'] }} </h1>
-    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+{% extends 'layout.html' %} {% block body %}
+<div class="hero">
+    <h1 class="display-4">AI Chat by {{ app_data['author'] }}</h1>
+    <p class="lead">
+        AI Chat is an AI chatbot that writes text. You can use it to write
+        stories, messages, or programming code. You can use the AI chatbot as a
+        virtual tutor in almost any subject.
+    </p>
     <p>Title: {{ app_data['html_title'] }}</p>
 
-    <hr class="my-4">
-    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <hr class="my-4" />
+    <p>
+        It uses utility classes for typography and spacing to space content out
+        within the larger container.
+    </p>
     <a class="btn btn-primary btn-lg" href="/contact" role="button">Contact</a>
-  </div>
+</div>
+<div class="container">
+    <div class="chat-area">
+        <!-- Chat content goes here -->
+        <h2>Chat with AI</h2>
+        <div id="chat-box">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <form id="chat-form">
+            <input
+                type="text"
+                id="user-input"
+                placeholder="Type your message here..."
+                required
+            />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <div class="sidebar">
+        <!-- Sidebar content like login and past chats go here -->
+        <h2>Login</h2>
+        <form id="login-form">
+            <input type="text" placeholder="Username" required />
+            <input type="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <h2>Past Chats</h2>
+        <ul id="past-chats">
+            <!-- List past chats here -->
+        </ul>
+    </div>
+</div>
 {% endblock %}

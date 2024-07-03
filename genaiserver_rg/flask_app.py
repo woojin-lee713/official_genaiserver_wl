@@ -21,7 +21,7 @@ app.database = 'sample.db'
 app_data = {
     "name": "Acme Inc. Customer Service App",
     "description": "Making our Customers happy since 2018!",
-    "author": "Woo Jin Lee",
+    "author": "Regina Garfias",
     "html_title": "Acme Inc. Customer Service App",
     "project_name": "Customer Service App",
     "keywords": "flask, webapp, tbasic",
@@ -127,4 +127,4 @@ if __name__ == "__main__":
 #Log in details
 #1. admin, admin
 #2. example, example
-#3. Jeremy, jeremy
+#3. Regina, Regina

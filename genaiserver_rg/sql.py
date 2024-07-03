@@ -1,5 +1,4 @@
 import sqlite3
-
 from datetime import datetime
 
 # Connect to SQLite database (or create it if it doesn't exist)
@@ -16,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 )
 ''')
 
+# Create 'models' table
 c.execute("DROP TABLE IF EXISTS models;")
 c.execute('''
 CREATE TABLE IF NOT EXISTS models (
@@ -24,11 +24,11 @@ CREATE TABLE IF NOT EXISTS models (
 )
 ''')
 
-# Create 'complaints' table
+# Create 'chats' table
 c.execute("DROP TABLE IF EXISTS chats;")
 c.execute('''
 CREATE TABLE IF NOT EXISTS chats (
-    complaint_id INTEGER PRIMARY KEY,
+    chat_id INTEGER PRIMARY KEY,
     user_id INTEGER,
     model_id INTEGER,
     chat TEXT,
@@ -48,15 +48,18 @@ c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('ex
 c.execute('SELECT userid FROM users WHERE username = ?', ('example',))
 example_user_id = c.fetchone()[0]
 
+# Get 'admin' user id
 c.execute('SELECT userid FROM users WHERE username = ?', ('admin',))
 admin_user_id = c.fetchone()[0]
 
+# Insert 'None' model
 c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('None',))
 
+# Get 'None' model id
 c.execute('SELECT modelid FROM models WHERE modelname = ?', ('None',))
 model_id = c.fetchone()[0]
 
-# Insert example complaints
+# Insert example chats
 chats = [
     (example_user_id, model_id, 'Chat 1 lorem ipsum', datetime.now()),
     (example_user_id, model_id, 'Chat 2 let us run a fast mile', datetime.now()),
