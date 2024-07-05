@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">= 3.11"
 dependencies = [
-    "genailib_rg @ https://test-files.pythonhosted.org/packages/f2/d4/e6d35e674705ce77bdedbb4f440134a816899f165e0e9d7b8b8ad305f98d/genailib_rg-0.1.1-py3-none-any.whl",
+    "genailib_rg @ https://test-files.pythonhosted.org/packages/ec/ff/a5b6a13937a8276d659814255a0b229c062871cb86db4028c398ff96ce48/genailib_rg-0.1.2-py3-none-any.whl",
 ]
 
 [build-system]
