@@ -1,13 +1,13 @@
 [project]
-name = "genaiserver_rg"
-version = "0.1.0"
-description = "A server for a chatbot that connects to OpenAI API"
+name = "official_genaiserver_wl"
+version = "0.0.1"
+description = "A user-friendly server of the created genai library using OpenAI API"
 authors = [
-    { name = "Regina Garfias", email = "120662824+SGGmilagro@users.noreply.github.com" },
+    { name = "Woo Jin Lee", email = "163913803+woojin-lee713@users.noreply.github.com" },
 ]
 requires-python = ">= 3.11"
 dependencies = [
-    "genailib_rg @ https://test-files.pythonhosted.org/packages/ec/ff/a5b6a13937a8276d659814255a0b229c062871cb86db4028c398ff96ce48/genailib_rg-0.1.2-py3-none-any.whl",
+    "official_genailib_wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl",
 ]
 
 [build-system]
@@ -19,11 +19,11 @@ channels = ["conda-forge"]
 platforms = ["osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
-genaiserver = { path = ".", editable = true }
+official_genaiserver_wl = { path = ".", editable = true }
 
 [tool.pixi.tasks]
-server = "python genaiserver_rg/flask_app.py"
-populate = "python genaiserver_rg/sql.py"
+server = "python genaiserver_wl_folder/flask_app.py"
+populate = "python genaiserver_wl_folder/sql.py"
 
 [tool.pixi.dependencies]
 flask = ">=3.0.3,<3.1"
@@ -35,7 +35,7 @@ openai = "*"
 python-dotenv = "*"
 
 [tool.setuptools]
-packages = ["genaiserver_rg"]
+packages = ["genaiserver_wl_folder"]
 
 [tool.pyright]
 venvPath = "."
