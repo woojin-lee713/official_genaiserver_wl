@@ -72,7 +72,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/20/9f/bc63f0f0737ad7a60800bfd472a4836661adae21f9c2535f3957b1e54ceb/jedi-0.19.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8f/8e/9ad090d3553c280a8060fbf6e24dc1c0c29704ee7d1c372f0c174aa59285/matplotlib_inline-0.1.7-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f0/0d/feb9c6e69c2d61c426c64d406aafbcbd86db3dcfbc6b80308e34313fdc98/nbdev-2.3.25-py3-none-any.whl
-      - pypi: direct+https://test-files.pythonhosted.org/packages/e8/7e/5ae2110eb194b23610bcbd4e7cfe54a654cc494ccede383fd674cff2e0fe/official_genailib_wl-1.1.1-py3-none-any.whl
+      - pypi: direct+https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/08/aa/cc0199a5f0ad350994d660967a8efb233fe0416e4639146c089643407ce6/packaging-24.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c6/ac/dac4a63f978e4dcb3c6d3a78c4d8e0192a113d288502a1216950c41b1027/parso-0.8.4-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9e/c3/059298687310d527a58bb01f3b1965787ee3b40dce76752eda8b44e9a2c5/pexpect-4.9.0-py2.py3-none-any.whl
@@ -848,8 +848,8 @@ packages:
   timestamp: 1715194898402
 - kind: pypi
   name: official-genailib-wl
-  version: 1.1.1
-  url: direct+https://test-files.pythonhosted.org/packages/e8/7e/5ae2110eb194b23610bcbd4e7cfe54a654cc494ccede383fd674cff2e0fe/official_genailib_wl-1.1.1-py3-none-any.whl
+  version: 1.5.0
+  url: direct+https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl
   requires_dist:
   - openai
   - click
@@ -870,9 +870,9 @@ packages:
   name: official-genaiserver-wl
   version: 0.0.1
   path: .
-  sha256: e30ff40c4ed7273fb60af893a05576ffde300faca223d065a019ea57334df98f
+  sha256: 5de0f286f5635858f57a54112c3aa23aef1635baf90de83997a4e3ff4de016ce
   requires_dist:
-  - official-genailib-wl @ https://test-files.pythonhosted.org/packages/e8/7e/5ae2110eb194b23610bcbd4e7cfe54a654cc494ccede383fd674cff2e0fe/official_genailib_wl-1.1.1-py3-none-any.whl
+  - official-genailib-wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl
   requires_python: '>=3.11'
   editable: true
 - kind: conda

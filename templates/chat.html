@@ -1,33 +1,195 @@
 {% extends 'layout.html' %} {% block body %}
-<h1>{{ app_data['description'] }}</h1>
-<h2>Customer Chat Box</h2>
-<br />
-<h3>So far...</h3>
-{% for chat in chats %}
-<hr />
-<p>{{ chat['chat'] }}</p>
-<strong>Posted at:</strong> {{ chat['time'] }} <br />
-{% endfor %}
-<br />
-
-<h3>Make a chat</h3>
-<div class="container">
-    <form id="chatForm">
-        <textarea rows="4" cols="50" name="chat" id="chatInput"></textarea>
-        <input
-            class="btn btn-default"
-            type="button"
-            value="Chat"
-            onclick="sendChat()"
-        />
-    </form>
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="bg-light p-4 border rounded">
+                <h2 class="h4">Chat Interface</h2>
+                <p><strong>Model Version:</strong> OpenAI GPT</p>
+                <button class="btn btn-primary mb-3" onclick="promptNewChat()">
+                    New Chat
+                </button>
+                <div class="chat-list">
+                    <h3 class="h5">Previous Chats</h3>
+                    {% for chat in chats %}
+                    <div
+                        class="chat-item border rounded p-2 my-2"
+                        onmouseover="showDeleteButton(this)"
+                        onmouseout="hideDeleteButton(this)"
+                        onclick="openChat({{ chat['chat_id'] }})"
+                    >
+                        <p class="m-0">{{ chat['title'] }}</p>
+                        <small class="text-muted"
+                            >Posted at: {{ chat['time'] }}</small
+                        >
+                        <button
+                            class="btn btn-danger btn-sm float-right delete-btn"
+                            style="display: none"
+                            onclick="event.stopPropagation(); deleteChat({{ chat['chat_id'] }})"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="chat-box p-4 border rounded bg-light">
+                <div id="chatHistory" class="chat-history mb-4">
+                    {% for chat in chats %}
+                    <div class="chat-message">
+                        <p class="text-right">
+                            <strong>You:</strong> {{ chat['chat'] }}
+                        </p>
+                        <p class="text-left">
+                            <strong>Bot:</strong> {{ chat['response'] }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="chat-input">
+                    <form id="chatForm" class="d-flex">
+                        <textarea
+                            class="form-control me-2"
+                            rows="4"
+                            cols="50"
+                            name="chat"
+                            id="chatInput"
+                            placeholder="Type your message here..."
+                        ></textarea>
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            onclick="sendChat()"
+                        >
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<br />
 
-<h3>Responses:</h3>
-<div id="chatResponses"></div>
+<!-- New Chat Modal -->
+<div
+    class="modal fade"
+    id="newChatModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="newChatModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newChatModalLabel">
+                    Create New Chat
+                </h5>
+                <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newChatForm">
+                    <div class="form-group">
+                        <label for="chatTitle">Chat Title</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="chatTitle"
+                            name="chatTitle"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="modelSelect">Model</label>
+                        <select
+                            class="form-control"
+                            id="modelSelect"
+                            name="modelSelect"
+                        >
+                            {% for model in models %}
+                            <option value="{{ model['modelid'] }}">
+                                {{ model['modelname'] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="createNewChat()"
+                >
+                    Create Chat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    function promptNewChat() {
+        $("#newChatModal").modal("show");
+    }
+
+    async function createNewChat() {
+        const title = document.getElementById("chatTitle").value;
+        const model_id = document.getElementById("modelSelect").value;
+
+        const response = await fetch("/create_chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title: title,
+                model_id: model_id,
+            }),
+        });
+
+        if (response.ok) {
+            location.reload();
+        }
+    }
+
+    async function deleteChat(chatId) {
+        const response = await fetch(`/delete_chat/${chatId}`, {
+            method: "DELETE",
+        });
+
+        if (response.ok) {
+            location.reload();
+        }
+    }
+
+    function openChat(chatId) {
+        window.location.href = `/chat/${chatId}`;
+    }
+
+    function showDeleteButton(chatItem) {
+        chatItem.querySelector(".delete-btn").style.display = "block";
+    }
+
+    function hideDeleteButton(chatItem) {
+        chatItem.querySelector(".delete-btn").style.display = "none";
+    }
+
     async function sendChat() {
         const chatInput = document.getElementById("chatInput").value;
         const response = await fetch("/get_response", {
@@ -37,14 +199,64 @@
             },
             body: JSON.stringify({ prompt: chatInput }),
         });
+
         const data = await response.json();
-        const chatResponses = document.getElementById("chatResponses");
+        const chatHistory = document.getElementById("chatHistory");
+
         if (data.response) {
-            chatResponses.innerHTML += "<p>" + data.response + "</p>";
+            chatHistory.innerHTML += `
+                <div class="chat-message">
+                    <p class="text-right"><strong>You:</strong> ${chatInput}</p>
+                    <p class="text-left"><strong>Bot:</strong> ${data.response}</p>
+                </div>
+            `;
+            document.getElementById("chatInput").value = "";
         } else {
-            chatResponses.innerHTML += "<p>Error: " + data.error + "</p>";
+            chatHistory.innerHTML += `
+                <div class="chat-message">
+                    <p class="text-danger text-left">Error: ${data.error}</p>
+                </div>
+            `;
         }
     }
 </script>
 
+<style>
+    .chat-box {
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 1rem;
+    }
+
+    .chat-message {
+        margin-bottom: 1rem;
+    }
+
+    .chat-input {
+        margin-top: 1rem;
+    }
+
+    .chat-item {
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .chat-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .delete-btn {
+        display: none;
+    }
+
+    .chat-item:hover .delete-btn {
+        display: inline;
+    }
+</style>
 {% endblock %}

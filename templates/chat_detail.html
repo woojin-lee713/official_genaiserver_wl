@@ -1,0 +1,168 @@
+{% extends 'layout.html' %} {% block body %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="chat-box p-4 border rounded bg-light">
+                <h2>{{ chat.title }}</h2>
+                <div id="chatHistory" class="chat-history mb-4">
+                    {% for message in messages %}
+                    <div class="chat-message">
+                        <p
+                            class="{{ 'text-right' if message.sender == 'You' else 'text-left' }}"
+                        >
+                            <strong>{{ message.sender }}:</strong> {{
+                            message.message }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="chat-input">
+                    <form id="chatForm" class="d-flex">
+                        <textarea
+                            class="form-control me-2"
+                            rows="4"
+                            cols="50"
+                            name="chat"
+                            id="chatInput"
+                            placeholder="Type your message here..."
+                        ></textarea>
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            onclick="sendChat()"
+                        >
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function sendChat() {
+        const chatInput = document.getElementById('chatInput').value;
+        const chatId = {{ chat.chat_id }};
+        const response = await fetch('/get_response', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt: chatInput }),
+        });
+
+        const data = await response.json();
+        const chatHistory = document.getElementById('chatHistory');
+
+        if (data.response) {
+            chatHistory.innerHTML += `
+                <div class="chat-message">
+                    <p class="text-right"><strong>You:</strong> ${chatInput}</p>
+                    <p class="text-left"><strong>Bot:</strong> ${data.response}</p>
+                </div>`;
+            document.getElementById('chatInput').value = '';
+        } else {
+            chatHistory.innerHTML += `
+                <div class="chat-message">
+                    <p class="text-danger text-left">Error: ${data.error}</p>
+                </div>`;
+        }
+
+        // Scroll to the bottom of the chat history
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    // Ensure the chat history is scrolled to the bottom on page load
+    window.onload = function() {
+        const chatHistory = document.getElementById('chatHistory');
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+</script>
+
+<style>
+    .chat-box {
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 1rem;
+    }
+
+    .chat-message {
+        margin-bottom: 1rem;
+    }
+
+    .chat-input {
+        margin-top: 1rem;
+    }
+
+    textarea {
+        width: 100%;
+        background-color: #1e1e1e;
+        color: #fff;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 10px;
+        resize: none;
+    }
+
+    textarea::placeholder {
+        color: #bbb;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .chat-item {
+        cursor: pointer;
+        transition: background-color 0.3s;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .chat-item:hover {
+        background-color: #333333;
+    }
+
+    .delete-btn {
+        display: none;
+        margin-left: 10px;
+    }
+
+    .chat-item:hover .delete-btn {
+        display: inline;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5 {
+        color: #ffffff;
+    }
+
+    form {
+        display: flex;
+    }
+
+    form textarea {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}

@@ -3,27 +3,22 @@ import sqlite3
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from genailib_wl_folder.genailib_wl_file import get_chat_responses  # Ensure this is correctly imported
+from genailib_wl_folder.genailib_wl_file import get_chat_responses
 import hashlib
 from functools import wraps
 
-from sql import initialize_database  # Import the database initialization function
+from sql import initialize_database, create_new_chat, delete_chat
 
-# Load environment variables from the .env file
 load_dotenv()
 
 DEVELOPMENT_ENV = True
 
-# Initialize the database
 initialize_database()
 
-# Connect to database
 def connect_db():
     return sqlite3.connect('sample.db')
 
 app = Flask(__name__, template_folder='../templates')
-
-# Config
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app_data = {
@@ -35,7 +30,6 @@ app_data = {
     "keywords": "flask, webapp, tbasic",
 }
 
-# login required decorator
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -67,18 +61,57 @@ def chat():
     username = session['username']
     cur = g.db.execute('SELECT userid FROM users WHERE username = ?', (username,))
     user_id = cur.fetchone()[0]
-    cur = g.db.execute('SELECT modelid FROM models WHERE modelname = ?', ('None',))
-    model_id = cur.fetchone()[0]
+
+    cur = g.db.execute('SELECT modelid, modelname FROM models')
+    models = [{'modelid': row[0], 'modelname': row[1]} for row in cur.fetchall()]
+
     if request.method == 'POST':
         chat = request.form['chat']
+        title = request.form['title']
+        model_id = request.form['model_id']
         thetime = datetime.now()
-        g.db.execute('INSERT INTO chats (user_id, model_id, chat, time) VALUES (?, ?, ?, ?)', (user_id, model_id, chat, thetime))
+        g.db.execute('INSERT INTO chats (user_id, model_id, title, chat, time) VALUES (?, ?, ?, ?, ?)', (user_id, model_id, title, chat, thetime))
         g.db.commit()
 
     cur2 = g.db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
-    chats = [dict(time=row[4], chat=row[3], chat_id=row[0]) for row in cur2.fetchall()]  # Add chat_id to the dictionary
+    chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0]) for row in cur2.fetchall()]
     g.db.close()
-    return render_template("chat.html", app_data=app_data, chats=chats)
+    return render_template("chat.html", app_data=app_data, chats=chats, models=models)
+
+@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+@login_required
+def open_chat(chat_id):
+    g.db = connect_db()
+    username = session['username']
+    cur = g.db.execute('SELECT userid FROM users WHERE username = ?', (username,))
+    user_id = cur.fetchone()[0]
+
+    cur = g.db.execute('SELECT * FROM chats WHERE chat_id = ?', (chat_id,))
+    chat = cur.fetchone()
+    chat_data = dict(time=chat[5], chat=chat[4], title=chat[3], chat_id=chat[0])
+
+    # Fetch all messages for the chat
+    cur_messages = g.db.execute('SELECT sender, message FROM chat_messages WHERE chat_id = ?', (chat_id,))
+    messages = [{'sender': row[0], 'message': row[1]} for row in cur_messages.fetchall()]
+
+    if request.method == 'POST':
+        new_message = request.form['chat']
+        sender = 'You'
+        g.db.execute('INSERT INTO chat_messages (chat_id, sender, message, timestamp) VALUES (?, ?, ?, ?)', (chat_id, sender, new_message, datetime.now()))
+        g.db.commit()
+        messages.append({'sender': sender, 'message': new_message})
+
+        # Get response from the bot
+        bot_response = get_chat_responses(new_message, model="gpt-3.5-turbo")
+        g.db.execute('INSERT INTO chat_messages (chat_id, sender, message, timestamp) VALUES (?, ?, ?, ?)', (chat_id, 'Bot', bot_response, datetime.now()))
+        g.db.commit()
+        messages.append({'sender': 'Bot', 'message': bot_response})
+
+    cur2 = g.db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
+    chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0]) for row in cur2.fetchall()]
+
+    g.db.close()
+    return render_template("chat_detail.html", app_data=app_data, chat=chat_data, messages=messages, chats=chats)
 
 @app.route('/get_response', methods=['POST'])
 def get_response():
@@ -86,12 +119,35 @@ def get_response():
     prompt = data.get('prompt', '')
 
     try:
-        # Use get_chat_responses function directly
         chat_text = get_chat_responses(prompt, model="gpt-3.5-turbo")
         return jsonify({"response": chat_text})
     except Exception as e:
         return jsonify({"error": str(e)})
 
+@app.route('/create_chat', methods=['POST'])
+@login_required
+def create_chat():
+    data = request.get_json()
+    if not data or 'model_id' not in data or 'title' not in data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    username = session['username']
+    g.db = connect_db()
+    cur = g.db.execute('SELECT userid FROM users WHERE username = ?', (username,))
+    user_id = cur.fetchone()[0]
+
+    chat = data.get('chat', '')
+    model_name = data.get('model_name', '')
+
+    create_new_chat(user_id, data['model_id'], data['title'], chat, model_name)
+    g.db.close()
+    return jsonify({"message": "Chat created successfully"}), 200
+
+@app.route('/delete_chat/<int:chat_id>', methods=['DELETE'])
+@login_required
+def delete_chat_endpoint(chat_id):
+    delete_chat(chat_id)
+    return jsonify({"message": "Chat deleted successfully"}), 200
 
 def lookup_user(username, password):
     g.db = connect_db()
@@ -141,8 +197,3 @@ def register():
 
 if __name__ == "__main__":
     app.run(debug=DEVELOPMENT_ENV)
-
-# Log in details
-# 1. admin, admin
-# 2. example, example
-# 3. Regina, Regina
