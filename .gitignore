@@ -1,5 +1,4 @@
 # pixi environments
 .pixi
-*.db
 *.egg-info
 .env.secret
