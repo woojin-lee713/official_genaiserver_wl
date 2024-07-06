@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy the application code to the container
 COPY . .
 
-# Install pixi
-RUN pip install pixi
+# Install pip
+RUN pip install --upgrade pip
 
 # Copy the install and migrate script to the container
 COPY install_and_migrate.sh .
@@ -23,4 +23,4 @@ RUN ./install_and_migrate.sh
 EXPOSE 5000
 
 # Run the application
-CMD ["pixi", "run", "server"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "serverdatabase.app:create_app()"]

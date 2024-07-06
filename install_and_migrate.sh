@@ -1,10 +1,7 @@
 #!/bin/sh
 
 # Install dependencies
-pixi sync
+pip install -r requirements.txt
 
 # Migrate the database
-pixi migrate
-
-# Re-run install to ensure all dependencies are in place
-pixi sync
+alembic upgrade head
