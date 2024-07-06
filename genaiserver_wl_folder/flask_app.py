@@ -93,6 +93,8 @@ def chat():
 
     cur2 = g.db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
     chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0], model_name=row[6]) for row in cur2.fetchall()]
+    if not chats:
+        chats = []  # Ensure chats is an empty list if no chats are found
     g.db.close()
 
     return render_template("chat.html", app_data=app_data, chats=chats, models=models)
@@ -276,8 +278,3 @@ def register():
 
 if __name__ == "__main__":
     app.run(debug=DEVELOPMENT_ENV)
-
-# Test Accounts
-# 1. admin, admin (only 1 sample chat)
-# 2. example, example (2 sample chats)
-# 3. admin1, admin1 (0 sample chats)
