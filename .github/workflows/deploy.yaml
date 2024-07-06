@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
 
       - name: Push to docker
-        uses: docker/github-action@master
+        uses: dokku/github-action@master
         with:
           branch: main
           git_remote_url: ssh://docker@rahuldave.us:22/official_genaiserver_wl
