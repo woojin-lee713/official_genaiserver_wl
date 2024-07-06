@@ -14,7 +14,7 @@ COPY pyproject.toml /app/
 RUN pip install pixi
 
 # Install dependencies
-RUN pixi install
+# RUN pixi install
 
 # Copy the application code
 COPY . /app
