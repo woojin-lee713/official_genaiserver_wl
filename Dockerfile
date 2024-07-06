@@ -7,14 +7,17 @@ WORKDIR /app
 # Copy the application code to the container
 COPY . .
 
-# Install dependencies
+# Install pixi
 RUN pip install pixi
 
-# Install dependencies using pixi
-RUN pixi install
+# Copy the install and migrate script to the container
+COPY install_and_migrate.sh .
 
-# Migrate the database
-RUN pixi migrate
+# Make the script executable
+RUN chmod +x install_and_migrate.sh
+
+# Run the install and migrate script
+RUN ./install_and_migrate.sh
 
 # Expose the port the app runs on
 EXPOSE 5000

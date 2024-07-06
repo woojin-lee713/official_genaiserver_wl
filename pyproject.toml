@@ -34,9 +34,9 @@ pydantic = ">=2.7.3,<2.8"
 openai = "*"
 python-dotenv = "*"
 
-[tasks]
-populate = "python -m todoapp.sql"
-server = "ENV=prod gunicorn -w 4 -b0.0.0.0:5000 'todoapp.app:create_app()'"
+[tool.tasks]
+populate = "python -m serverdatabase.db"
+server = "ENV=prod gunicorn -w -b 0.0.0.0:5000 'serverdatabase.app:create_app()'"
 
 [tool.setuptools]
 packages = ["genaiserver_wl_folder"]
