@@ -5,13 +5,13 @@ FROM node:14
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Install npm dependencies
 RUN npm install
 
-# Install pixi globally
-RUN npm install -g @pixi/cli
+# Install pixi globally if referring to Pixijs CLI
+RUN npm install -g pixi.js
 
 # Copy the rest of the application code
 COPY . .
