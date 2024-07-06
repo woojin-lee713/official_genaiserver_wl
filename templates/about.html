@@ -6,71 +6,71 @@
     <div class="container">
         <h2 class="my-4">Empowering Conversations, Enriching Lives</h2>
         <p>
-            Welcome to Lu & Regina, a cutting-edge chat bot project designed to
-            revolutionize the way you interact with technology. Our mission is
-            to harness the power of artificial intelligence to provide seamless,
-            intelligent, and human-like conversations that can assist you in
-            various aspects of your daily life.
+            Welcome to our project, a state-of-the-art chat bot designed to
+            transform the way you communicate with technology. Our aim is to
+            leverage the potential of artificial intelligence to deliver fluid,
+            intelligent, and human-like interactions that can assist you in
+            numerous aspects of your daily routine.
         </p>
 
         <h3 class="my-4">Who We Are</h3>
         <p>
-            We are a team of passionate developers, AI enthusiasts, and
-            innovators committed to pushing the boundaries of what artificial
-            intelligence can achieve. Our diverse team brings together expertise
-            from fields such as computer science, natural language processing,
-            and user experience design to create a chat bot that not only
-            understands you but also anticipates your needs.
+            We are a team of dedicated developers, AI enthusiasts, and
+            innovators passionate about expanding the limits of artificial
+            intelligence. Our diverse group includes experts in computer
+            science, natural language processing, and user experience design,
+            all working together to create a chat bot that not only understands
+            you but also anticipates your needs.
         </p>
 
         <h3 class="my-4">What We Do</h3>
         <p>
-            Lu & Regina, powered by the OpenAI API, is designed to engage in
-            meaningful conversations, answer questions, and provide assistance
-            on a wide range of topics. Whether you need help with scheduling,
-            information on a specific subject, or just a friendly chat, our bot
-            is here to help.
+            EllishGPT inc., powered by the OpenAI API, is crafted to engage in
+            meaningful conversations, answer queries, and provide assistance on
+            a broad range of topics. Whether you need help with scheduling,
+            information on a specific topic, or just a friendly chat, our bot is
+            here for you.
         </p>
 
         <h3 class="my-4">Our Technology</h3>
         <p>
-            At the core of our project lies the advanced OpenAI API, which
-            allows Lu & Regina to process natural language, understand context,
-            and generate human-like responses. By leveraging this powerful
-            technology, we aim to deliver an experience that is not only
-            functional but also engaging and intuitive.
+            At the heart of our project is the advanced OpenAI API, which
+            enables EllishGPT inc. to process natural language, comprehend
+            context, and generate human-like responses. By utilizing this
+            powerful technology, we strive to offer an experience that is both
+            functional and engaging.
         </p>
 
         <h3 class="my-4">Why Choose Us?</h3>
         <ul>
             <li>
-                <strong>Intelligent Conversations:</strong> Lu & Regina uses
-                state-of-the-art AI to understand and respond to your queries in
-                a natural and coherent manner.
+                <strong>Intelligent Conversations:</strong> EllishGPT inc. uses
+                cutting-edge AI to understand and respond to your inquiries in a
+                natural and coherent way.
             </li>
             <li>
                 <strong>Versatile Assistance:</strong> From answering academic
-                questions to providing lifestyle tips, Lu & Regina is versatile
-                and ready to assist with a wide range of inquiries.
+                questions to providing lifestyle tips, EllishGPT inc. is
+                versatile and ready to help with a wide array of inquiries.
             </li>
             <li>
-                <strong>User-Centric Design:</strong> We prioritize user
-                experience, ensuring that interactions with Lu & Regina are
+                <strong>User-Centric Design:</strong> We focus on user
+                experience, ensuring that interactions with EllishGPT inc. are
                 smooth, intuitive, and enjoyable.
             </li>
             <li>
-                <strong>Continuous Improvement:</strong> We are committed to
-                continually improving Lu & Regina by incorporating user feedback
-                and staying up-to-date with the latest advancements in AI
+                <strong>Continuous Improvement:</strong> We are dedicated to
+                continuously enhancing EllishGPT inc. by incorporating user
+                feedback and staying updated with the latest advancements in AI
                 technology.
             </li>
         </ul>
 
         <h3 class="my-4">Our Vision</h3>
         <p>
-            We envision a future where AI-driven chat bots become an integral
+            We envision a future where AI-driven chat bots become a fundamental
             part of everyday life, making technology more accessible and
-            interactions more human-like. Our goal is to create a chat bot that
+            interactions more human-like. Our goal is to develop a chat bot that
             not only assists but also enriches the lives of its users through
             intelligent and engaging conversations.
         </p>
@@ -79,13 +79,45 @@
         <p>
             We love hearing from our users! If you have any questions, feedback,
             or suggestions, please feel free to reach out to us. Your insights
-            are invaluable as we strive to make Lu & Regina the best it can be.
+            are invaluable as we strive to make EllishGPT inc. the best it can
+            be.
         </p>
 
         <p>
-            Thank you for choosing Lu & Regina. We look forward to chatting with
-            you!
+            Thank you for choosing EllishGPT inc. We look forward to chatting
+            with you!
         </p>
     </div>
 </div>
+
+<div class="container text-center mt-5">
+    <p>&copy; 2024 EllishGPT inc. All rights reserved.</p>
+    <p>Team Members: Woo Jin Lee, Carla Sofia Ramirez Gonzalez & Zane Malik</p>
+</div>
+
+<style>
+    body {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    body.fade-out {
+        opacity: 0;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("a").forEach(function (anchor) {
+            anchor.addEventListener("click", function (event) {
+                event.preventDefault();
+                let linkLocation = this.href;
+                document.body.classList.add("fade-out");
+                setTimeout(function () {
+                    window.location = linkLocation;
+                }, 500);
+            });
+        });
+    });
+</script>
 {% endblock %}

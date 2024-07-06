@@ -22,11 +22,11 @@ app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app_data = {
-    "name": "Acme Inc. Customer Service App",
-    "description": "Making our Customers happy since 2018!",
-    "author": "Regina Garfias",
-    "html_title": "Acme Inc. Customer Service App",
-    "project_name": "Customer Service App",
+    "name": "SCIA Team Team-1: Woo Jin Lee, Carla Sofia Ramirez Gonzalez, Zane Malik",
+    "description": "Creating an AI Chatbot Service",
+    "author": "Woo Jin Lee",
+    "html_title": "OpenAI EllishGPT",
+    "project_name": "EllishGPT",
     "keywords": "flask, webapp, tbasic",
 }
 
@@ -117,9 +117,16 @@ def open_chat(chat_id):
 def get_response():
     data = request.get_json()
     prompt = data.get('prompt', '')
+    chat_id = data.get('chat_id', '')
 
     try:
         chat_text = get_chat_responses(prompt, model="gpt-3.5-turbo")
+
+        g.db = connect_db()
+        g.db.execute('INSERT INTO chat_messages (chat_id, sender, message, timestamp) VALUES (?, ?, ?, ?)', (chat_id, 'Bot', chat_text, datetime.now()))
+        g.db.commit()
+        g.db.close()
+
         return jsonify({"response": chat_text})
     except Exception as e:
         return jsonify({"error": str(e)})

@@ -1,8 +1,31 @@
 {% extends 'layout.html' %} {% block body %}
-<div class="container-fluid py-5">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="chat-box p-4 border rounded bg-light">
+<div class="container-fluid p-0">
+    <div class="row" style="height: 90vh; overflow: hidden">
+        <!-- Sidebar -->
+        <div class="col-md-2 d-flex align-items-stretch p-0">
+            <div
+                class="list-group sidebar d-flex flex-column justify-content-start w-100"
+                style="height: 100%; border-radius: 10px 0 0 10px"
+            >
+                {% for chat_item in chats %}
+                <a
+                    href="{{ url_for('open_chat', chat_id=chat_item.chat_id) }}"
+                    class="list-group-item list-group-item-action sidebar-item {{ 'active' if chat.chat_id == chat_item.chat_id else '' }}"
+                >
+                    {{ chat_item.title }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Chat Box -->
+        <div
+            class="col-md-10 d-flex flex-column justify-content-center align-items-center p-0"
+            style="height: 100%; border-radius: 0 10px 10px 0"
+        >
+            <div
+                class="chat-box p-4 border rounded bg-white"
+                style="flex-grow: 1; padding: 50px; border: 2px solid black"
+            >
                 <h2>{{ chat.title }}</h2>
                 <div id="chatHistory" class="chat-history mb-4">
                     {% for message in messages %}
@@ -27,7 +50,7 @@
                             placeholder="Type your message here..."
                         ></textarea>
                         <button
-                            class="btn btn-primary"
+                            class="btn btn-gradient"
                             type="button"
                             onclick="sendChat()"
                         >
@@ -35,6 +58,78 @@
                         </button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Chat Modal -->
+<div
+    class="modal fade"
+    id="newChatModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="newChatModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newChatModalLabel">
+                    Create New Chat
+                </h5>
+                <button
+                    type="button"
+                    class="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newChatForm">
+                    <div class="form-group">
+                        <label for="chatTitle">Chat Title</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="chatTitle"
+                            name="chatTitle"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="modelSelect">Model</label>
+                        <select
+                            class="form-control"
+                            id="modelSelect"
+                            name="modelSelect"
+                        >
+                            {% for model in models %}
+                            <option value="{{ model['modelid'] }}">
+                                {{ model['modelname'] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="createNewChat()"
+                >
+                    Create Chat
+                </button>
             </div>
         </div>
     </div>
@@ -49,7 +144,7 @@
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ prompt: chatInput }),
+            body: JSON.stringify({ prompt: chatInput, chat_id: chatId }),
         });
 
         const data = await response.json();
@@ -78,13 +173,111 @@
         const chatHistory = document.getElementById('chatHistory');
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
+
+    function promptNewChat() {
+        const modal = new bootstrap.Modal(document.getElementById('newChatModal'));
+        modal.show();
+    }
+
+    async function createNewChat() {
+        const title = document.getElementById("chatTitle").value;
+        const model_id = document.getElementById("modelSelect").value;
+
+        const response = await fetch("/create_chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title: title,
+                model_id: model_id,
+            }),
+        });
+
+        if (response.ok) {
+            location.reload();
+        }
+    }
 </script>
 
 <style>
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    body {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    body.fade-out {
+        opacity: 0;
+    }
+
+    .sidebar {
+        background-color: #c8d6e5;
+        height: 100%;
+        flex-grow: 1;
+    }
+
+    .sidebar-item {
+        background-color: #1e3c72;
+        color: white;
+        margin-bottom: 0;
+        border-radius: 0;
+        padding: 10px;
+        text-align: center;
+        transition:
+            background-color 0.3s,
+            color 0.3s;
+    }
+
+    .sidebar-item:hover {
+        background-color: #dce8f6;
+        color: black;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition:
+            background 0.3s,
+            transform 0.3s;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a77d1, #8655c5);
+        transform: translateY(-2px);
+    }
+
+    .responsive-img {
+        max-width: 175px;
+        width: 100%;
+        height: auto;
+    }
+
+    .responsive-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
     .chat-box {
-        height: 80vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
+        border: 2px solid black;
     }
 
     .chat-history {
@@ -127,6 +320,17 @@
 
     button:hover {
         background-color: #0056b3;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    .list-group-item.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
     }
 
     .chat-item {

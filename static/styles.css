@@ -138,3 +138,28 @@ form textarea {
     flex-grow: 1;
     margin-right: 10px;
 }
+
+/* Navbar styles */
+.navbar-nav .nav-item .nav-link {
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+    color: #d4d4d4;
+}
+
+.navbar-nav .nav-item.active .nav-link {
+    font-weight: bold;
+    color: #f8f9fa;
+}
+
+.navbar-nav .nav-item .nav-link {
+    margin-right: 15px;
+}
+
+.navbar-text {
+    margin-left: 30px;
+    color: white;
+    align-self: center;
+}
