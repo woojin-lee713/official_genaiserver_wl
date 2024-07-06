@@ -1,29 +1,23 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.11-slim
+# Use an official Python runtime as a parent image
+FROM python:3.11
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-
-# Create and set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy pyproject.toml
-COPY pyproject.toml /app/
-
-# Install pixi
-RUN pip install pixi
+# Copy the application code to the container
+COPY . .
 
 # Install dependencies
+RUN pip install pixi
+
+# Install dependencies using pixi
 RUN pixi install
 
-# Copy the application code
-COPY . /app
+# Migrate the database
+RUN pixi migrate
 
-# Expose the port that the application runs on
+# Expose the port the app runs on
 EXPOSE 5000
-
-# Populate the database
-RUN pixi run populate
 
 # Run the application
 CMD ["pixi", "run", "server"]
