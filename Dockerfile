@@ -1,29 +1,29 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12
+# Use a base image that includes Node.js
+FROM node:14
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install npm dependencies
+RUN npm install
 
-# Install pixi
-RUN curl -fsSL https://get.pixi.dev/install.sh | sh
+# Install pixi globally
+RUN npm install -g @pixi/cli
 
-# Add pixi to PATH
-ENV PATH="/root/.pixi/bin:$PATH"
+# Copy the rest of the application code
+COPY . .
 
 # Install dependencies using pixi
-RUN pixi run install
+RUN pixi install
 
-# Initialize and run migrations
-RUN pixi run init && pixi run migrate
+# Initialize and run migrations (add any necessary commands here)
+# RUN pixi run populate
 
-# Expose the port the app runs on
-EXPOSE 5000
+# Expose the port your app runs on
+EXPOSE 3000
 
-# Run the app
-CMD ["pixi", "run", "server"]
+# Command to run your application
+CMD ["npm", "start"]
