@@ -1,4 +1,4 @@
-name: Deploy
+name: "deploy"
 
 on:
   push:
@@ -7,23 +7,25 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Cloning repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H rahuldave.us >> ~/.ssh/known_hosts
 
-      - name: Deploy to Dokku
-        env:
-          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
-        run: |
-          git push dokku main:master
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          branch: main
+          git_remote_url: "ssh://dokku@rahuldave.us:22/official_genailib_wl"
+          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
