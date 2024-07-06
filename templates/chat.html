@@ -6,19 +6,15 @@
             <div
                 class="list-group sidebar d-flex flex-column justify-content-start w-100"
                 style="height: 100%; border-radius: 10px 0 0 10px"
-            ></div>
-                {% if chats %} {% for chat in chats %}
+            >
+                {% for chat in chats %}
                 <a
                     href="{{ url_for('open_chat', chat_id=chat.chat_id) }}"
                     class="list-group-item list-group-item-action sidebar-item"
                 >
                     {{ chat.title }}
                 </a>
-                {% endfor %} {% else %}
-                <p class="list-group-item">
-                    No chats available. Start a new conversation!
-                </p>
-                {% endif %}
+                {% endfor %}
             </div>
         </div>
         <!-- Chat Interface Placeholder -->
@@ -42,7 +38,6 @@
                 class="d-flex flex-column justify-content-center align-items-center"
                 style="flex-grow: 1; padding: 50px"
             >
-                {% if chats %}
                 <a href="{{ url_for('open_chat', chat_id=chats[0].chat_id) }}">
                     <img
                         src="https://i.ibb.co/bFyrMHf/416bc6e8-929e-46fe-84a5-4d2a881081c5-removebg-preview-removebg-preview.png"
@@ -51,14 +46,6 @@
                         class="img-fluid responsive-img"
                     />
                 </a>
-                {% else %}
-                <img
-                    src="https://i.ibb.co/bFyrMHf/416bc6e8-929e-46fe-84a5-4d2a881081c5-removebg-preview-removebg-preview.png"
-                    alt="Chat Icon"
-                    border="0"
-                    class="img-fluid responsive-img"
-                />
-                {% endif %}
             </div>
             <div class="mb-4 d-flex justify-content-center w-100">
                 <button

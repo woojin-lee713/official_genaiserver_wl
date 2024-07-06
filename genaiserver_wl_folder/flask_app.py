@@ -81,36 +81,41 @@ def create_app():
     @app.route("/chat", methods=['GET', 'POST'])
     @login_required
     def chat():
-        db = get_db()
-        username = session['username']
-        cur = db.execute('SELECT userid FROM users WHERE username = ?', (username,))
-        result = cur.fetchone()
+        try:
+            db = get_db()
+            username = session['username']
+            cur = db.execute('SELECT userid FROM users WHERE username = ?', (username,))
+            result = cur.fetchone()
 
-        if result is None:
-            flash("User not found.")
+            if result is None:
+                flash("User not found.")
+                return redirect(url_for('index'))
+
+            user_id = result[0]
+
+            cur = db.execute('SELECT modelid, modelname FROM models')
+            models = [{'modelid': row[0], 'modelname': row[1]} for row in cur.fetchall()]
+
+            if request.method == 'POST':
+                chat = request.form['chat']
+                title = request.form['title']
+                model_id = request.form['model_id']
+                model_name = next((model['modelname'] for model in models if model['modelid'] == int(model_id)), 'Unknown')
+                thetime = datetime.now()
+                db.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
+                           (user_id, model_id, title, chat, thetime, model_name))
+                db.commit()
+
+            cur2 = db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
+            chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0], model_name=row[6]) for row in cur2.fetchall()]
+            if not chats:
+                chats = []  # Ensure chats is an empty list if no chats are found
+
+            return render_template("chat.html", app_data=app_data, chats=chats, models=models)
+        except Exception as e:
+            logging.exception("Error in chat route: %s", e)
+            flash("An error occurred. Please try again.")
             return redirect(url_for('index'))
-
-        user_id = result[0]
-
-        cur = db.execute('SELECT modelid, modelname FROM models')
-        models = [{'modelid': row[0], 'modelname': row[1]} for row in cur.fetchall()]
-
-        if request.method == 'POST':
-            chat = request.form['chat']
-            title = request.form['title']
-            model_id = request.form['model_id']
-            model_name = next((model['modelname'] for model in models if model['modelid'] == int(model_id)), 'Unknown')
-            thetime = datetime.now()
-            db.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
-                       (user_id, model_id, title, chat, thetime, model_name))
-            db.commit()
-
-        cur2 = db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
-        chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0], model_name=row[6]) for row in cur2.fetchall()]
-        if not chats:
-            chats = []  # Ensure chats is an empty list if no chats are found
-
-        return render_template("chat.html", app_data=app_data, chats=chats, models=models)
 
     @app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
     @login_required

@@ -36,7 +36,7 @@ python-dotenv = "*"
 
 [tool.tasks]
 populate = "python genaiserver_wl_folder/sql.py"
-server = "python genaiserver_wl_folder/flask_app.py"
+server = "gunicorn -w 4 -b 0.0.0.0:5000 genaiserver_wl_folder.flask_app:app"
 
 [tool.setuptools]
 packages = ["genaiserver_wl_folder"]

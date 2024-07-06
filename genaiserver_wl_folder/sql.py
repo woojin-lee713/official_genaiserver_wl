@@ -1,24 +1,34 @@
-import hashlib
-from datetime import datetime
 import sqlite3
-from sqlite3 import Connection
+from datetime import datetime
 from genaiserver_wl_folder.config import get_configs
+import hashlib
 import logging
+
+def adapt_datetime(ts):
+    return ts.strftime('%Y-%m-%d %H:%M:%S')
+
+def convert_datetime(s):
+    return datetime.strptime(s.decode('utf-8'), '%Y-%m-%d %H:%M:%S')
+
+sqlite3.register_adapter(datetime, adapt_datetime)
+sqlite3.register_converter("timestamp", convert_datetime)
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
-def get_db(dbfile: str) -> Connection:
-    db = sqlite3.connect(dbfile)
+def get_db(dbfile: str) -> sqlite3.Connection:
+    "Get a connection to the database"
+    db = sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES)
     db.row_factory = sqlite3.Row
     return db
 
-def unget_db(db: Connection):
+def unget_db(db: sqlite3.Connection):
+    "Close the connection to the database"
     db.close()
 
 def initialize_database(dbfile: str):
     try:
-        with sqlite3.connect(dbfile) as conn:
+        with sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
             c = conn.cursor()
 
             c.execute("DROP TABLE IF EXISTS users;")
@@ -46,7 +56,7 @@ def initialize_database(dbfile: str):
                 model_id INTEGER,
                 title TEXT,
                 chat TEXT,
-                time DATETIME,
+                time TIMESTAMP,
                 model_name TEXT,
                 FOREIGN KEY(user_id) REFERENCES users(userid),
                 FOREIGN KEY(model_id) REFERENCES models(modelid)
@@ -60,7 +70,7 @@ def initialize_database(dbfile: str):
                 chat_id INTEGER,
                 sender TEXT,
                 message TEXT,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (chat_id) REFERENCES chats(chat_id)
             )
             ''')
@@ -112,7 +122,7 @@ def initialize_database(dbfile: str):
 
 def create_new_chat(user_id: int, model_id: int, title: str, chat: str, model_name: str):
     try:
-        with sqlite3.connect('serverdatabase.db') as conn:
+        with sqlite3.connect('serverdatabase.db', detect_types=sqlite3.PARSE_DECLTYPES) as conn:
             c = conn.cursor()
             c.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
                       (user_id, model_id, title, chat, datetime.now(), model_name))
