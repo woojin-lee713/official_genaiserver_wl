@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 
 def initialize_database():
-    conn = sqlite3.connect('sample.db')
+    conn = sqlite3.connect('serverdatabase.db')
     c = conn.cursor()
 
     c.execute("DROP TABLE IF EXISTS users;")
@@ -92,7 +92,7 @@ def initialize_database():
     print("Database and tables created successfully with initial data.")
 
 def create_new_chat(user_id, model_id, title, chat, model_name):
-    conn = sqlite3.connect('sample.db')
+    conn = sqlite3.connect('serverdatabase.db')
     c = conn.cursor()
     c.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
               (user_id, model_id, title, chat, datetime.now(), model_name))
@@ -100,7 +100,7 @@ def create_new_chat(user_id, model_id, title, chat, model_name):
     conn.close()
 
 def delete_chat(chat_id):
-    conn = sqlite3.connect('sample.db')
+    conn = sqlite3.connect('serverdatabase.db')
     c = conn.cursor()
     c.execute('DELETE FROM chats WHERE chat_id = ?', (chat_id,))
     c.execute('DELETE FROM chat_messages WHERE chat_id = ?', (chat_id,))

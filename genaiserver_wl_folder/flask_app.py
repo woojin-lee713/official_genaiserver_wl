@@ -9,14 +9,16 @@ from functools import wraps
 
 from sql import initialize_database, create_new_chat, delete_chat
 
+# Load environment variables from .env and .env.secret
 load_dotenv()
+load_dotenv('.env.secret')
 
 DEVELOPMENT_ENV = True
 
 initialize_database()
 
 def connect_db():
-    return sqlite3.connect('sample.db')
+    return sqlite3.connect('serverdatabase.db')
 
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
