@@ -16,8 +16,11 @@ RUN curl -fsSL https://get.pixi.dev/install.sh | sh
 # Add pixi to PATH
 ENV PATH="/root/.pixi/bin:$PATH"
 
-# Install dependencies using pixi and run database migrations
-RUN ./install_and_migrate.sh
+# Install dependencies using pixi
+RUN pixi install
+
+# Initialize and run migrations
+RUN pixi run init && pixi run migrate
 
 # Expose the port the app runs on
 EXPOSE 5000
