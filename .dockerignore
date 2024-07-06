@@ -97,8 +97,6 @@ celerybeat-schedule
 # Ignore SageMath parsed files
 *.sage.py
 
-# Ignore dotenv files
-.env
 
 # Ignore virtualenv directories
 .venv
