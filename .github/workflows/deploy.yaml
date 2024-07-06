@@ -1,4 +1,4 @@
-name: deploy
+name: "deploy"
 
 on:
   push:
@@ -14,12 +14,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.DOKKU_PRIVATE_KEY }}
-
       - name: Push to dokku
-        run: |
-          git remote add dokku ssh://dokku@rahuldave.us:22/officialgenaiserverwl
-          git push dokku main:master
+        uses: dokku/github-action@master
+        with:
+          branch: main
+          git_remote_url: "ssh://dokku@rahuldave.us:22/officialgenaiserverwl"
+          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}

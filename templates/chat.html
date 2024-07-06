@@ -6,7 +6,7 @@
             <div
                 class="list-group sidebar d-flex flex-column justify-content-start w-100"
                 style="height: 100%; border-radius: 10px 0 0 10px"
-            >
+            ></div>
                 {% if chats %} {% for chat in chats %}
                 <a
                     href="{{ url_for('open_chat', chat_id=chat.chat_id) }}"
