@@ -22,7 +22,7 @@ RUN pixi install
 # You could have scp'd .env.prod to the server as /var/lib/dokku/data/storage/todoapprd/.env
 # and set the DATABASE_FILE env var there in the file instead.
 
-ENV DATABASE_FILE=/app/storage/serverdatabase.db
+ENV DATABASE_FILE=serverdatabase.db
 ENV ENV=prod
 
 CMD pixi run populate; pixi run server
