@@ -8,29 +8,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Cloning repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DOKKU_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H rahuldave.us >> ~/.ssh/known_hosts
-          printf "Host rahuldave.us\n  HostName rahuldave.us\n  User dokku\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no\n" > ~/.ssh/config
-
-      - name: Test SSH connection
-        env:
-          GIT_SSH_COMMAND: "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no"
-        run: ssh -v dokku@rahuldave.us -p 22 || true # Adding verbosity for debugging
-
-      - name: Push to Dokku
-        env:
-          GIT_SSH_COMMAND: "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no"
-        run: |
-          git remote add dokku ssh://dokku@rahuldave.us:22/official_genaiserver_wl
-          git push dokku main:master
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          branch: main
+          git_remote_url: "ssh://dokku@rahuldave.us:22/oficial_genaiserver_wl"
+          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
