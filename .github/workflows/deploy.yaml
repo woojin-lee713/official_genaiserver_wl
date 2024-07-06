@@ -16,20 +16,20 @@ jobs:
           fetch-depth: 0
 
       - name: Set up SSH
-        env:
-          DOKKU_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "$DOKKU_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.DOKKU_PRIVATE_KEY }}" > ~/.ssh/notwoojinlee713_rsa
+          chmod 600 ~/.ssh/notwoojinlee713_rsa
           ssh-keyscan -H rahuldave.us >> ~/.ssh/known_hosts
 
       - name: Test SSH connection
-        run: ssh -T docker@rahuldave.us -p 22 || true
+        env:
+          GIT_SSH_COMMAND: "ssh -i ~/.ssh/notwoojinlee713_rsa -o StrictHostKeyChecking=no"
+        run: ssh -v -T docker@rahuldave.us -p 22 || true # Adding verbosity for debugging
 
       - name: Push to Dokku
         env:
-          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
+          GIT_SSH_COMMAND: "ssh -i ~/.ssh/notwoojinlee713_rsa -o StrictHostKeyChecking=no"
         run: |
           git remote add dokku ssh://docker@rahuldave.us:22/official_genaiserver_wl
           git push dokku main:master
