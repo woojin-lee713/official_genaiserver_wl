@@ -13,6 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Set up SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -107,4 +111,4 @@ jobs:
           -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
           -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
           -v "/home/runner/work/official_genaiserver_wl/official_genaiserver_wl":"/github/workspace" \
-          f1a7b9:6621a7ac3f914242a71aaf41e2ce668b
+          your-docker-image:your-tag
