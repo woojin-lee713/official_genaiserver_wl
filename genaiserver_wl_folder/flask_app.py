@@ -14,14 +14,17 @@ from sql import initialize_database, create_new_chat, delete_chat
 load_dotenv()
 load_dotenv('.env.secret')
 
-DEVELOPMENT_ENV = True
+DEVELOPMENT_ENV = os.getenv("FLASK_ENV") == "development"
+DEBUG = os.getenv("DEBUG") == "True"
+DATABASE_FILE = os.getenv("DATABASE_FILE", "serverdatabase.db")
+TEMPLATE_FOLDER = os.getenv("TEMPLATE_FOLDER", "../templates")
 
 initialize_database()
 
 def connect_db():
-    return sqlite3.connect('serverdatabase.db')
+    return sqlite3.connect(DATABASE_FILE)
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app_data = {
@@ -36,7 +39,7 @@ app_data = {
 DEFAULT_MODEL = "gpt-3.5-turbo"
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 
 def login_required(f):
     @wraps(f)

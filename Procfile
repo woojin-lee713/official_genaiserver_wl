@@ -1,0 +1,1 @@
+web: pixi run server

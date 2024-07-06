@@ -1,29 +1,29 @@
-FROM ghcr.io/prefix-dev/pixi:latest
+# Use the official Python image from the Docker Hub
+FROM python:3.11-slim
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Create and set the working directory
 WORKDIR /app
-COPY . /app
 
+# Copy pyproject.toml
+COPY pyproject.toml /app/
+
+# Install pixi
+RUN pip install pixi
+
+# Install dependencies
 RUN pixi install
 
-# To make this work on dokku, you need to:
-# 1. `ssh dokku storage:ensure-directory todoapprd`
-# 2. `ssh dokku storage:mount todoapprd /var/lib/dokku/data/storage/todoapprd:/app/storage`
-#
-# Alternatively:
-# 1. `ssh <your_user>@<host> "mkdir todoapprd_mount"`
-# 2. Create your secret files etc. in `todoapprd_mount` folder
-# 3. `ssh dokku storage:mount todoapprd /home/<your_user>/todoapprd_mount:/app/storage`
-#
-# One can set environment variables with dokku using `dokku config:set`, but for simplicity,
-# it is done here. You may also set this variable in /app/storage/.env file. See config.py for more info.
+# Copy the application code
+COPY . /app
 
-# This is the path to the sqlite database file. It is mounted to /app/storage in the Docker container.
-# It is located at /var/lib/dokku/data/storage/todoapprd on the filesystem of the host machine.
-# This setup ensures data persistence in the database even if the container is destroyed.
-# You could have scp'd .env.prod to the server as /var/lib/dokku/data/storage/todoapprd/.env
-# and set the DATABASE_FILE env var there in the file instead.
+# Expose the port that the application runs on
+EXPOSE 5000
 
-ENV DATABASE_FILE=serverdatabase.db
-ENV ENV=prod
+# Populate the database
+RUN pixi run populate
 
-CMD ["sh", "-c", "pixi run populate && pixi run server"]
+# Run the application
+CMD ["pixi", "run", "server"]
