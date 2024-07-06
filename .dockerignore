@@ -1,0 +1,136 @@
+# Ignore version control directories
+.git
+
+# Ignore pixi environments
+.pixi
+
+# Ignore secrets
+.env.secret
+
+# Ignore backup files
+*.bak
+
+# Ignore logs and temporary files
+*.log
+*~
+~*
+_tmp*
+tmp*
+tags
+
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore C extensions
+*.so
+
+# Ignore distribution / packaging files
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ignore PyInstaller files
+*.manifest
+*.spec
+
+# Ignore installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Ignore translations
+*.mo
+*.pot
+
+# Ignore Django stuff
+*.log
+local_settings.py
+
+# Ignore Flask stuff
+instance/
+.webassets-cache
+
+# Ignore Scrapy stuff
+.scrapy
+
+# Ignore Sphinx documentation build files
+docs/_build/
+
+# Ignore PyBuilder files
+target/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Ignore pyenv version file
+.python-version
+
+# Ignore celery beat schedule file
+celerybeat-schedule
+
+# Ignore SageMath parsed files
+*.sage.py
+
+# Ignore dotenv files
+.env
+
+# Ignore virtualenv directories
+.venv
+venv/
+ENV/
+
+# Ignore Spyder project settings
+.spyderproject
+.spyproject
+
+# Ignore Rope project settings
+.ropeproject
+
+# Ignore mkdocs documentation build files
+/site
+
+# Ignore mypy cache files
+.mypy_cache/
+
+# Ignore Visual Studio Code settings
+.vscode
+
+# Ignore swap files
+*.swp
+
+# Ignore OSX generated files
+.DS_Store
+.DS_Store?
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea
+
+# Ignore pytest cache
+.pytest_cache
