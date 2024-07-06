@@ -1,26 +1,20 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the application code to the container
+# Copy the application code
 COPY . .
 
-# Install pip
-RUN pip install --upgrade pip
+# Ensure the install_and_migrate.sh script is executable
+RUN chmod +x ./install_and_migrate.sh
 
-# Copy the install and migrate script to the container
-COPY install_and_migrate.sh .
-
-# Make the script executable
-RUN chmod +x install_and_migrate.sh
-
-# Run the install and migrate script
+# Install dependencies using pixi and run database migrations
 RUN ./install_and_migrate.sh
 
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Run the application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "serverdatabase.app:create_app()"]
+# Command to run the application
+CMD ["pixi", "run", "server"]

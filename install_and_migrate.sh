@@ -1,7 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies using pixi
+pixi install
 
-# Migrate the database
-alembic upgrade head
+# Check if Alembic is initialized, if not, initialize it
+if [ ! -d "serverdatabase/migrations" ]; then
+  pixi run alembic init serverdatabase/migrations
+fi
+
+# Run database migrations
+pixi run alembic upgrade head || { echo "Alembic upgrade failed"; exit 1; }
+
+echo "Install and migration completed successfully."
