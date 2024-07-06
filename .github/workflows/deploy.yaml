@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
+
     steps:
       - name: Cloning repo
         uses: actions/checkout@v3
@@ -15,17 +16,13 @@ jobs:
           fetch-depth: 0
 
       - name: Set up SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "${{ secrets.DOKKU_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H rahuldave.us >> ~/.ssh/known_hosts
 
-      - name: Push to dokku
-        uses: dokku/github-action@master
-        with:
-          branch: main
-          git_remote_url: "ssh://dokku@rahuldave.us:22/official_genailib_wl"
-          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
+      - name: Push to Dokku
+        run: |
+          git remote add dokku ssh://dokku@rahuldave.us:22/official_genaiserver_wl
+          git push dokku main:master
