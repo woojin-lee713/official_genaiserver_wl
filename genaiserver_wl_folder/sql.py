@@ -1,5 +1,9 @@
-import sqlite3
+import hashlib
 from datetime import datetime
+import sqlite3
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def initialize_database():
     conn = sqlite3.connect('serverdatabase.db')
@@ -49,8 +53,11 @@ def initialize_database():
     )
     ''')
 
-    c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('admin', 'admin'))
-    c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('example', 'example'))
+    hashed_admin_password = hash_password('admin')
+    hashed_example_password = hash_password('example')
+
+    c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('admin', hashed_admin_password))
+    c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('example', hashed_example_password))
 
     c.execute('SELECT userid FROM users WHERE username = ?', ('example',))
     example_user_id = c.fetchone()[0]
@@ -59,7 +66,6 @@ def initialize_database():
     admin_user_id = c.fetchone()[0]
 
     c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('None',))
-    c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('text-davinci-003',))
     c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-3.5-turbo',))
     c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-4',))
     c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-4-turbo',))
@@ -68,9 +74,8 @@ def initialize_database():
     model_id = c.fetchone()[0]
 
     chats = [
-        (example_user_id, model_id, 'Example Chat 1', 'Chat 1 lorem ipsum', datetime.now(), 'text-davinci-003'),
-        (example_user_id, model_id, 'Example Chat 2', 'Chat 2 let us run a fast mile', datetime.now(), 'text-davinci-003'),
-        (admin_user_id, model_id, 'Example Chat 3', 'Chat 3 let us run a fast mile', datetime.now(), 'text-davinci-003'),
+        (example_user_id, model_id, 'Example Chat 1', 'Chat 1 lorem ipsum', datetime.now(), 'gpt-3.5-turbo'),
+        (example_user_id, model_id, 'Example Chat 2', 'Chat 2 let us run a fast mile', datetime.now(), 'gpt-4'),
     ]
 
     c.executemany('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)', chats)
@@ -80,8 +85,6 @@ def initialize_database():
         (1, 'Bot', 'I am good, thank you!', datetime.now()),
         (2, 'You', 'What is the weather today?', datetime.now()),
         (2, 'Bot', 'It is sunny today.', datetime.now()),
-        (3, 'You', 'Tell me a joke.', datetime.now()),
-        (3, 'Bot', 'Why don’t scientists trust atoms? Because they make up everything!', datetime.now())
     ]
 
     c.executemany('INSERT INTO chat_messages (chat_id, sender, message, timestamp) VALUES (?, ?, ?, ?)', messages)

@@ -12,51 +12,63 @@
                 "
             >
                 {% for chat in chats %}
-                <a
-                    href="{{ url_for('open_chat', chat_id=chat.chat_id) }}"
-                    class="list-group-item list-group-item-action sidebar-item"
-                >
-                    {{ chat.title }}
-                </a>
+                <div class="position-relative chat-item">
+                    <a
+                        href="{{ url_for('open_chat', chat_id=chat.chat_id) }}"
+                        class="list-group-item list-group-item-action sidebar-item"
+                    >
+                        {{ chat.title }}
+                    </a>
+                    <button
+                        class="btn btn-danger btn-sm position-absolute top-50 end-0 translate-middle-y delete-button"
+                        onclick="deleteChat({{ chat.chat_id }})"
+                        style="display: none"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
                 {% endfor %}
             </div>
         </div>
         <!-- Chat Interface -->
         <div
-            class="col-md-9 d-flex flex-column justify-content-center align-items-center p-0"
+            class="col-md-9 d-flex flex-column p-0"
             style="
                 height: 100%;
                 border-radius: 0 10px 10px 0;
-                background-color: #ffffff; /* Set the background color here */
+                background-color: #ffffff;
             "
         >
             <div
                 class="d-flex justify-content-between align-items-center w-100 px-4 py-2"
+                style="flex-shrink: 0"
             >
                 <h2>{{ chat.title }}</h2>
-                <span class="badge bg-primary">{{ model_name }}</span>
+                <span class="badge bg-primary">{{ chat.model_name }}</span>
             </div>
             <div
                 class="chat-box p-4 border rounded bg-white"
                 style="
                     flex-grow: 1;
                     padding: 20px;
-                    width: 90%;
-                    height: 100%;
+                    height: 0;
                     border: 2px solid black;
+                    overflow-y: auto;
                 "
             >
                 <div
                     id="chatHistory"
                     class="chat-history mb-4"
-                    style="flex-grow: 1; overflow-y: auto; padding-bottom: 1rem"
+                    style="flex-grow: 1; padding-bottom: 1rem"
                 >
                     {% for message in messages %}
                     <div
-                        class="chat-message {{ 'text-right' if message.sender == 'You' else 'text-left' }}"
+                        class="chat-message {{ 'align-self-end' if message.sender == 'You' else 'align-self-start' }}"
+                        style="display: flex; flex-direction: column; align-items: {{ 'flex-end' if message.sender == 'You' else 'flex-start' }};"
                     >
                         <div
                             class="message-bubble {{ 'user-bubble' if message.sender == 'You' else 'bot-bubble' }}"
+                            style="{{ 'background-color: #72a0c1; color: white;' if message.sender == 'You' else 'background-color: #1e3c72; color: white;' }}"
                         >
                             <strong>{{ message.sender }}:</strong> {{
                             message.message }}
@@ -64,7 +76,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <div class="chat-input">
+                <div class="chat-input" style="flex-shrink: 0">
                     <form id="chatForm" class="d-flex align-items-center">
                         <textarea
                             class="form-control me-2"
@@ -120,78 +132,6 @@
     </div>
 </div>
 
-<!-- New Chat Modal -->
-<div
-    class="modal fade"
-    id="newChatModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="newChatModalLabel"
-    aria-hidden="true"
->
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="newChatModalLabel">
-                    Create New Chat
-                </h5>
-                <button
-                    type="button"
-                    class="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                >
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="newChatForm">
-                    <div class="form-group">
-                        <label for="chatTitle">Chat Title</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="chatTitle"
-                            name="chatTitle"
-                            required
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="modelSelect">Model</label>
-                        <select
-                            class="form-control"
-                            id="modelSelect"
-                            name="modelSelect"
-                        >
-                            {% for model in models %}
-                            <option value="{{ model['modelid'] }}">
-                                {{ model['modelname'] }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                >
-                    Close
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    onclick="createNewChat()"
-                >
-                    Create Chat
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll("a").forEach(function (anchor) {
@@ -212,68 +152,99 @@
         });
     });
 
-    function promptNewChat() {
-        const modal = new bootstrap.Modal(document.getElementById("newChatModal"));
-        modal.show();
-    }
-
     async function sendChat() {
         const chatInput = document.getElementById('chatInput').value;
         const chatId = {{ chat.chat_id }};
-        const response = await fetch('/get_response', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ prompt: chatInput, chat_id: chatId }),
-        });
-
-        const data = await response.json();
         const chatHistory = document.getElementById('chatHistory');
 
-        if (data.response) {
-            chatHistory.innerHTML += `
-                <div class="chat-message text-right">
-                    <div class="message-bubble user-bubble">
-                        <strong>You:</strong> ${chatInput}
-                    </div>
+        if (chatInput.trim() === "") return;  // Prevent sending empty messages
+
+        // Show user message immediately
+        chatHistory.innerHTML += `
+            <div class="chat-message align-self-end" style="display: flex; flex-direction: column; align-items: flex-end;">
+                <div class="message-bubble user-bubble" style="background-color: #72a0c1; color: white;">
+                    <strong>You:</strong> ${chatInput}
                 </div>
-                <div class="chat-message text-left">
-                    <div class="message-bubble bot-bubble">
-                        <strong>Bot:</strong> ${data.response}
-                    </div>
-                </div>`;
-            document.getElementById('chatInput').value = '';
-        } else {
+            </div>`;
+        document.getElementById('chatInput').value = '';
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        // Show typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'chat-message align-self-start';
+        typingIndicator.style = 'display: flex; flex-direction: column; align-items: flex-start;';
+        typingIndicator.innerHTML = `
+            <div class="message-bubble bot-bubble typing-indicator" style="background-color: #1e3c72; color: white;">
+                <strong>Ellish:</strong> <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+            </div>`;
+        chatHistory.appendChild(typingIndicator);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        // Fetch the response
+        try {
+            const response = await fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: chatInput, chat_id: chatId }),
+            });
+
+            const data = await response.json();
+            chatHistory.removeChild(typingIndicator);
+
+            if (data.response) {
+                const botMessageElement = document.createElement('div');
+                botMessageElement.className = 'chat-message align-self-start';
+                botMessageElement.style = 'display: flex; flex-direction: column; align-items: flex-start;';
+                botMessageElement.innerHTML = `
+                    <div class="message-bubble bot-bubble" style="background-color: #1e3c72; color: white;">
+                        <strong>Ellish:</strong> <span class="bot-response"></span>
+                    </div>`;
+                chatHistory.appendChild(botMessageElement);
+                typeResponse(data.response, botMessageElement.querySelector('.bot-response'));
+            } else {
+                chatHistory.innerHTML += `
+                    <div class="chat-message align-self-start" style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <div class="message-bubble bot-bubble" style="background-color: #1e3c72; color: white;">
+                            <p class="text-danger">Error: ${data.error}</p>
+                        </div>
+                    </div>`;
+            }
+
+            // Scroll to the bottom of the chat history
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        } catch (error) {
+            chatHistory.removeChild(typingIndicator);
             chatHistory.innerHTML += `
-                <div class="chat-message text-left">
-                    <div class="message-bubble bot-bubble">
-                        <p class="text-danger">Error: ${data.error}</p>
+                <div class="chat-message align-self-start" style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <div class="message-bubble bot-bubble" style="background-color: #1e3c72; color: white;">
+                        <p class="text-danger">Error: ${error.message}</p>
                     </div>
                 </div>`;
         }
-
-        // Scroll to the bottom of the chat history
-        chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
-    async function createNewChat() {
-        const title = document.getElementById("chatTitle").value;
-        const model_id = document.getElementById("modelSelect").value;
+    function typeResponse(text, element) {
+        let index = 0;
+        function type() {
+            if (index < text.length) {
+                element.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(type, 50); // Adjust typing speed here
+            }
+        }
+        type();
+    }
 
-        const response = await fetch("/create_chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                title: title,
-                model_id: model_id,
-            }),
+    async function deleteChat(chatId) {
+        const response = await fetch(`/delete_chat/${chatId}`, {
+            method: 'DELETE'
         });
-
         if (response.ok) {
             location.reload();
+        } else {
+            alert('Failed to delete chat');
         }
     }
 </script>
@@ -362,6 +333,7 @@
         display: flex;
         flex-direction: column;
         width: 100%;
+        overflow-y: auto;
     }
 
     .chat-history {
@@ -425,12 +397,54 @@
         background-color: #72a0c1;
         color: white;
         align-self: flex-end;
+        text-align: right;
     }
 
     .bot-bubble {
         background-color: #1e3c72;
         color: white;
         align-self: flex-start;
+        text-align: left;
+    }
+
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 1.5rem;
+    }
+
+    .typing-dots {
+        display: inline-block;
+        margin-left: 0.5rem;
+    }
+
+    .typing-dots span {
+        display: inline-block;
+        width: 0.4rem;
+        height: 0.4rem;
+        background-color: white;
+        border-radius: 50%;
+        animation: blink 1.4s infinite both;
+    }
+
+    .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+        0%,
+        80%,
+        100% {
+            opacity: 0;
+        }
+        40% {
+            opacity: 1;
+        }
     }
 
     .badge {
@@ -439,6 +453,10 @@
         padding: 5px 10px;
         border-radius: 15px;
         font-size: 0.9rem;
+    }
+
+    .delete-button {
+        display: none; /* or display: block; if you want it always visible */
     }
 </style>
 {% endblock %}
