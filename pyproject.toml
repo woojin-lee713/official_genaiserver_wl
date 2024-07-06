@@ -5,7 +5,7 @@ description = "A user-friendly server of the created genai library using OpenAI 
 authors = [
     { name = "Woo Jin Lee", email = "163913803+woojin-lee713@users.noreply.github.com" },
 ]
-requires-python = ">= 3.11"
+requires-python = ">=3.11"
 dependencies = [
     "official_genailib_wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl",
 ]
@@ -35,8 +35,8 @@ openai = "*"
 python-dotenv = "*"
 
 [tool.tasks]
-populate = "python -m serverdatabase.db"
-server = "ENV=prod gunicorn -w -b 0.0.0.0:5000 'serverdatabase.app:create_app()'"
+populate = "python genaiserver_wl_folder/sql.py"
+server = "python genaiserver_wl_folder/flask_app.py"
 
 [tool.setuptools]
 packages = ["genaiserver_wl_folder"]
