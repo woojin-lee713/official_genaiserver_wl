@@ -1,13 +1,175 @@
 {% extends 'layout.html' %} {% block body %}
-<div class="hero">
-    <h1>Please Register</h1>
+<div
+    class="container-fluid d-flex align-items-center justify-content-center"
+    style="height: 100vh"
+>
+    <div class="login-wrapper p-4">
+        <div class="hero text-center mb-4">
+            <h1>Please Register</h1>
+        </div>
+        <form id="register-form" action="" method="post">
+            <div class="mb-3">
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Username"
+                    name="username"
+                    value="{{ request.form.username }}"
+                    required
+                />
+            </div>
+            <div class="mb-3">
+                <input
+                    type="password"
+                    class="form-control"
+                    placeholder="Password"
+                    name="password"
+                    value="{{ request.form.password }}"
+                    required
+                />
+            </div>
+            <div class="d-grid">
+                <input
+                    class="btn btn-gradient"
+                    type="submit"
+                    value="Register"
+                />
+            </div>
+        </form>
+        {% if error %}
+        <div class="alert alert-danger mt-3">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %} {% for message in get_flashed_messages() %}
+        <div class="alert alert-info mt-3">{{ message }}</div>
+        {% endfor %}
+    </div>
 </div>
-<div class="container">
-    <form action="" method="post">
-        <input type="text" placeholder="Username" name="username" />
-        <input type="password" placeholder="Password" name="password" />
-        <input class="btn btn-default" type="submit" value="Register" />
-    </form>
-    {% for message in get_flashed_messages() %} {{ message }} {% endfor %}
-</div>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: linear-gradient(120deg, #add8e6, #00008b, #8a2be2, #add8e6);
+        background-size: 600% 600%;
+        animation: aurora 11s ease infinite;
+    }
+
+    @keyframes aurora {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .container-fluid {
+        opacity: 0;
+        transform: translateY(-100px);
+        animation:
+            slideIn 1s ease forwards,
+            fadeIn 2s ease-in-out forwards;
+    }
+
+    @keyframes slideIn {
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    .fade-out {
+        animation: fadeOut 1s forwards;
+    }
+
+    @keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateY(100px);
+        }
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition:
+            background 0.2s,
+            transform 0.2s;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a77d1, #8655c5);
+        transform: translateY(-2px);
+    }
+
+    .login-wrapper {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        animation: popUp 0.5s ease-out;
+    }
+
+    @keyframes popUp {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+        color: #1e3c72;
+        margin: 0;
+    }
+
+    .form-control {
+        border-radius: 25px;
+        padding: 10px;
+        border: 1px solid #333;
+        background-color: #d3d3d3;
+        color: black;
+    }
+
+    .form-control::placeholder {
+        color: #333;
+    }
+
+    .alert {
+        border-radius: 25px;
+        padding: 10px;
+        font-size: 14px;
+    }
+</style>
+
+<script>
+    document
+        .getElementById("register-form")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
+            document
+                .querySelector(".container-fluid")
+                .classList.add("fade-out");
+            setTimeout(() => {
+                this.submit();
+            }, 1000); // Match this to the duration of the fadeOut animation
+        });
+</script>
 {% endblock %}
