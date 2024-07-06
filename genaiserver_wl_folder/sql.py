@@ -76,6 +76,7 @@ def initialize_database():
     chats = [
         (example_user_id, model_id, 'Example Chat 1', 'Chat 1 lorem ipsum', datetime.now(), 'gpt-3.5-turbo'),
         (example_user_id, model_id, 'Example Chat 2', 'Chat 2 let us run a fast mile', datetime.now(), 'gpt-4'),
+        (admin_user_id, model_id, 'Example Chat 3', 'Chat 3 let us run a fast mile', datetime.now(), 'gpt-4-turbo'),
     ]
 
     c.executemany('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)', chats)
@@ -85,6 +86,8 @@ def initialize_database():
         (1, 'Bot', 'I am good, thank you!', datetime.now()),
         (2, 'You', 'What is the weather today?', datetime.now()),
         (2, 'Bot', 'It is sunny today.', datetime.now()),
+        (3, 'You', 'Tell me a joke.', datetime.now()),
+        (3, 'Bot', 'Why don’t scientists trust atoms? Because they make up everything!', datetime.now())
     ]
 
     c.executemany('INSERT INTO chat_messages (chat_id, sender, message, timestamp) VALUES (?, ?, ?, ?)', messages)
