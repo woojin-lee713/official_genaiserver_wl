@@ -1,5 +1,4 @@
-official_genailib_wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl
-Flask==2.1.1
+flask>=3.0.3,<3.1
 python-dotenv==0.19.2
 sqlalchemy>=2.0.30,<2.1
 click>=8.1.7,<8.2
@@ -7,3 +6,4 @@ requests>=2.32.3,<2.33
 pydantic>=2.7.3,<2.8
 openai
 gunicorn
+official-genailib-wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl

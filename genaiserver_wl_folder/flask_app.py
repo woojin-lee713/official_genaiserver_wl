@@ -9,7 +9,7 @@ from functools import wraps
 import logging
 
 from genaiserver_wl_folder.config import get_configs
-from genaiserver_wl_folder.sql import get_db as sql_get_db, unget_db, initialize_database, create_new_chat
+from genaiserver_wl_folder.sql import initialize_database, create_new_chat
 
 # Load environment variables from .env and .env.secret
 load_dotenv()
@@ -40,7 +40,7 @@ def create_app():
             database_file = app.config["DATABASE_FILE"]
             if not database_file:
                 raise ValueError("DATABASE_FILE is not set in the configuration.")
-            g.db = sqlite3.connect(database_file)
+            g.db = sqlite3.connect(database_file, detect_types=sqlite3.PARSE_DECLTYPES)
             g.db.row_factory = sqlite3.Row
         return g.db
 
@@ -280,6 +280,7 @@ def create_app():
 
     return app
 
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
     app.run()

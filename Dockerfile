@@ -3,15 +3,25 @@ FROM ghcr.io/prefix-dev/pixi:latest
 WORKDIR /app
 COPY . /app
 
-# Install dependencies using pixi
-RUN pixi install
+# Install Python and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip
 
-# Install gunicorn
-RUN pixi add gunicorn
+# Install necessary Python packages including Cython and Wheel first
+RUN pip3 install cython wheel
+
+# Copy requirements.txt and install necessary Python packages
+COPY requirements.txt /app/
+RUN pip3 install -r requirements.txt
+
+# Install pixi dependencies
+RUN pixi install
 
 # Set environment variables
 ENV DATABASE_FILE=/app/storage/serverdatabase.db
 ENV ENV=prod
 
-# Use a production-ready server (gunicorn) to run the application
-CMD pixi run populate && gunicorn -w 4 -b 0.0.0.0:5000 genaiserver_wl_folder.flask_app:app
+# Ensure the storage directory exists
+RUN mkdir -p /app/storage
+
+CMD pixi run populate && gunicorn genaiserver_wl_folder.flask_app:app --bind 0.0.0.0:5000

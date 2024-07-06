@@ -1,8 +1,14 @@
+import sys
+import os
 import sqlite3
 from datetime import datetime
-from genaiserver_wl_folder.config import get_configs
 import hashlib
 import logging
+
+# Add the project's root directory to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from genaiserver_wl_folder.config import get_configs
 
 def adapt_datetime(ts):
     return ts.strftime('%Y-%m-%d %H:%M:%S')
@@ -18,6 +24,8 @@ def hash_password(password: str) -> str:
 
 def get_db(dbfile: str) -> sqlite3.Connection:
     "Get a connection to the database"
+    if not os.path.exists(os.path.dirname(dbfile)):
+        os.makedirs(os.path.dirname(dbfile))
     db = sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES)
     db.row_factory = sqlite3.Row
     return db
@@ -28,6 +36,10 @@ def unget_db(db: sqlite3.Connection):
 
 def initialize_database(dbfile: str):
     try:
+        if dbfile == "":
+            raise ValueError("Database file path is empty")
+        if not os.path.exists(os.path.dirname(dbfile)) and os.path.dirname(dbfile) != "":
+            os.makedirs(os.path.dirname(dbfile))
         with sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
             c = conn.cursor()
 
@@ -119,21 +131,31 @@ def initialize_database(dbfile: str):
         print("Database and tables created successfully with initial data.")
     except sqlite3.Error as e:
         logging.exception(f"Error initializing the database: {e}")
+    except ValueError as ve:
+        logging.error(ve)
 
 def create_new_chat(user_id: int, model_id: int, title: str, chat: str, model_name: str):
     try:
-        with sqlite3.connect('serverdatabase.db', detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+        config = get_configs()
+        dbfile = config.get("DATABASE_FILE")
+
+        if dbfile is None or dbfile == "":
+            raise ValueError("DATABASE_FILE is not set or is empty in the configuration.")
+
+        with sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
             c = conn.cursor()
             c.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
                       (user_id, model_id, title, chat, datetime.now(), model_name))
             conn.commit()
     except sqlite3.Error as e:
         logging.exception(f"Error creating new chat: {e}")
+    except ValueError as ve:
+        logging.error(ve)
 
 if __name__ == "__main__":
     config = get_configs()
     if config:
-        dbfile = config["DATABASE_FILE"]
+        dbfile = config.get("DATABASE_FILE")
         if dbfile:
             initialize_database(dbfile)
         else:
