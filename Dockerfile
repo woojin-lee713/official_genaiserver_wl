@@ -17,7 +17,7 @@ RUN curl -fsSL https://get.pixi.dev/install.sh | sh
 ENV PATH="/root/.pixi/bin:$PATH"
 
 # Install dependencies using pixi
-RUN pixi install
+RUN pixi run install
 
 # Initialize and run migrations
 RUN pixi run init && pixi run migrate
