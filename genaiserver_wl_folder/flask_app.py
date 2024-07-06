@@ -17,6 +17,7 @@ load_dotenv('.env.secret')
 DEVELOPMENT_ENV = True
 
 initialize_database()
+logging.basicConfig(level=logging.WARNING)
 
 def connect_db():
     return sqlite3.connect('serverdatabase.db')
