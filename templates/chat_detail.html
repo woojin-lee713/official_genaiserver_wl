@@ -1,60 +1,117 @@
 {% extends 'layout.html' %} {% block body %}
-<div class="container-fluid p-0">
+<div class="container-fluid">
     <div class="row" style="height: 90vh; overflow: hidden">
         <!-- Sidebar -->
-        <div class="col-md-2 d-flex align-items-stretch p-0">
+        <div class="col-md-3 d-flex align-items-stretch p-0">
             <div
                 class="list-group sidebar d-flex flex-column justify-content-start w-100"
-                style="height: 100%; border-radius: 10px 0 0 10px"
+                style="
+                    height: 100%;
+                    border-radius: 10px 0 0 10px;
+                    background-color: #d3d3d3;
+                "
             >
-                {% for chat_item in chats %}
+                {% for chat in chats %}
                 <a
-                    href="{{ url_for('open_chat', chat_id=chat_item.chat_id) }}"
-                    class="list-group-item list-group-item-action sidebar-item {{ 'active' if chat.chat_id == chat_item.chat_id else '' }}"
+                    href="{{ url_for('open_chat', chat_id=chat.chat_id) }}"
+                    class="list-group-item list-group-item-action sidebar-item"
                 >
-                    {{ chat_item.title }}
+                    {{ chat.title }}
                 </a>
                 {% endfor %}
             </div>
         </div>
-        <!-- Chat Box -->
+        <!-- Chat Interface -->
         <div
-            class="col-md-10 d-flex flex-column justify-content-center align-items-center p-0"
-            style="height: 100%; border-radius: 0 10px 10px 0"
+            class="col-md-9 d-flex flex-column justify-content-center align-items-center p-0"
+            style="
+                height: 100%;
+                border-radius: 0 10px 10px 0;
+                background-color: #ffffff; /* Set the background color here */
+            "
         >
             <div
-                class="chat-box p-4 border rounded bg-white"
-                style="flex-grow: 1; padding: 50px; border: 2px solid black"
+                class="d-flex justify-content-between align-items-center w-100 px-4 py-2"
             >
                 <h2>{{ chat.title }}</h2>
-                <div id="chatHistory" class="chat-history mb-4">
+                <span class="badge bg-primary">{{ model_name }}</span>
+            </div>
+            <div
+                class="chat-box p-4 border rounded bg-white"
+                style="
+                    flex-grow: 1;
+                    padding: 20px;
+                    width: 90%;
+                    height: 100%;
+                    border: 2px solid black;
+                "
+            >
+                <div
+                    id="chatHistory"
+                    class="chat-history mb-4"
+                    style="flex-grow: 1; overflow-y: auto; padding-bottom: 1rem"
+                >
                     {% for message in messages %}
-                    <div class="chat-message">
-                        <p
-                            class="{{ 'text-right' if message.sender == 'You' else 'text-left' }}"
+                    <div
+                        class="chat-message {{ 'text-right' if message.sender == 'You' else 'text-left' }}"
+                    >
+                        <div
+                            class="message-bubble {{ 'user-bubble' if message.sender == 'You' else 'bot-bubble' }}"
                         >
                             <strong>{{ message.sender }}:</strong> {{
                             message.message }}
-                        </p>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
                 <div class="chat-input">
-                    <form id="chatForm" class="d-flex">
+                    <form id="chatForm" class="d-flex align-items-center">
                         <textarea
                             class="form-control me-2"
-                            rows="4"
-                            cols="50"
+                            rows="1"
                             name="chat"
                             id="chatInput"
                             placeholder="Type your message here..."
+                            style="
+                                background-color: #d3d3d3;
+                                color: black;
+                                border: 1px solid #333;
+                                border-radius: 25px;
+                                padding: 10px;
+                                resize: none;
+                                flex-grow: 1;
+                                max-height: 100px;
+                                overflow-y: auto;
+                            "
                         ></textarea>
                         <button
                             class="btn btn-gradient"
                             type="button"
                             onclick="sendChat()"
+                            style="
+                                background: #1e3c72;
+                                color: white;
+                                border: none;
+                                border-radius: 50%;
+                                padding: 10px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                position: absolute;
+                                right: 10px;
+                            "
                         >
-                            Send
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="white"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M2.01 21l20.99-9-20.99-9-.01 7 15 2-15 2z"
+                                />
+                            </svg>
                         </button>
                     </form>
                 </div>
@@ -136,6 +193,30 @@
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("a").forEach(function (anchor) {
+            anchor.addEventListener("click", function (event) {
+                event.preventDefault();
+                let linkLocation = this.href;
+                document.body.classList.add("fade-out");
+                setTimeout(function () {
+                    window.location = linkLocation;
+                }, 500);
+            });
+        });
+
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+
+    function promptNewChat() {
+        const modal = new bootstrap.Modal(document.getElementById("newChatModal"));
+        modal.show();
+    }
+
     async function sendChat() {
         const chatInput = document.getElementById('chatInput').value;
         const chatId = {{ chat.chat_id }};
@@ -152,31 +233,28 @@
 
         if (data.response) {
             chatHistory.innerHTML += `
-                <div class="chat-message">
-                    <p class="text-right"><strong>You:</strong> ${chatInput}</p>
-                    <p class="text-left"><strong>Bot:</strong> ${data.response}</p>
+                <div class="chat-message text-right">
+                    <div class="message-bubble user-bubble">
+                        <strong>You:</strong> ${chatInput}
+                    </div>
+                </div>
+                <div class="chat-message text-left">
+                    <div class="message-bubble bot-bubble">
+                        <strong>Bot:</strong> ${data.response}
+                    </div>
                 </div>`;
             document.getElementById('chatInput').value = '';
         } else {
             chatHistory.innerHTML += `
-                <div class="chat-message">
-                    <p class="text-danger text-left">Error: ${data.error}</p>
+                <div class="chat-message text-left">
+                    <div class="message-bubble bot-bubble">
+                        <p class="text-danger">Error: ${data.error}</p>
+                    </div>
                 </div>`;
         }
 
         // Scroll to the bottom of the chat history
         chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    // Ensure the chat history is scrolled to the bottom on page load
-    window.onload = function() {
-        const chatHistory = document.getElementById('chatHistory');
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    function promptNewChat() {
-        const modal = new bootstrap.Modal(document.getElementById('newChatModal'));
-        modal.show();
     }
 
     async function createNewChat() {
@@ -201,18 +279,6 @@
 </script>
 
 <style>
-    @keyframes gradient {
-        0% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0% 50%;
-        }
-    }
-
     body {
         opacity: 1;
         transition: opacity 0.5s ease-in-out;
@@ -223,7 +289,7 @@
     }
 
     .sidebar {
-        background-color: #c8d6e5;
+        background-color: #d3d3d3;
         height: 100%;
         flex-grow: 1;
     }
@@ -231,8 +297,8 @@
     .sidebar-item {
         background-color: #1e3c72;
         color: white;
-        margin-bottom: 0;
-        border-radius: 0;
+        margin-bottom: 10px;
+        border-radius: 5px;
         padding: 10px;
         text-align: center;
         transition:
@@ -273,11 +339,29 @@
         font-size: 14px;
     }
 
+    @media (max-width: 768px) {
+        .list-group-item {
+            font-size: 0.9rem;
+        }
+
+        .responsive-img {
+            max-width: 120px;
+        }
+
+        .responsive-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .sidebar {
+            max-width: 150px;
+        }
+    }
+
     .chat-box {
-        height: 100%;
         display: flex;
         flex-direction: column;
-        border: 2px solid black;
+        width: 100%;
     }
 
     .chat-history {
@@ -292,81 +376,69 @@
 
     .chat-input {
         margin-top: 1rem;
+        position: relative;
     }
 
     textarea {
         width: 100%;
-        background-color: #1e1e1e;
-        color: #fff;
+        background-color: #d3d3d3;
+        color: black;
         border: 1px solid #333;
-        border-radius: 4px;
+        border-radius: 25px;
         padding: 10px;
         resize: none;
+        flex-grow: 1;
+        max-height: 100px;
+        overflow-y: auto;
     }
 
     textarea::placeholder {
-        color: #bbb;
+        color: #333;
     }
 
     button {
-        background-color: #007bff;
+        background-color: #1e3c72;
         color: #fff;
         border: none;
-        border-radius: 4px;
-        padding: 10px 20px;
+        border-radius: 50%;
+        padding: 10px;
         cursor: pointer;
         transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: 10px;
     }
 
     button:hover {
-        background-color: #0056b3;
+        background-color: #153963;
     }
 
-    .list-group-item {
-        cursor: pointer;
-        margin-bottom: 0;
-    }
-
-    .list-group-item.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
-
-    .chat-item {
-        cursor: pointer;
-        transition: background-color 0.3s;
+    .message-bubble {
+        border-radius: 15px;
         padding: 10px;
-        border-radius: 4px;
+        max-width: 75%;
     }
 
-    .chat-item:hover {
-        background-color: #333333;
+    .user-bubble {
+        background-color: #72a0c1;
+        color: white;
+        align-self: flex-end;
     }
 
-    .delete-btn {
-        display: none;
-        margin-left: 10px;
+    .bot-bubble {
+        background-color: #1e3c72;
+        color: white;
+        align-self: flex-start;
     }
 
-    .chat-item:hover .delete-btn {
-        display: inline;
-    }
-
-    h2,
-    h3,
-    h4,
-    h5 {
-        color: #ffffff;
-    }
-
-    form {
-        display: flex;
-    }
-
-    form textarea {
-        flex-grow: 1;
-        margin-right: 10px;
+    .badge {
+        background-color: #1e3c72;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9rem;
     }
 </style>
 {% endblock %}
