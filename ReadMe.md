@@ -214,7 +214,7 @@ Clone the repository and install the necessary Python packages:
 
 ## Setting Up Environment Variables
 
-This project requires an OpenAI API key and a Flask secret key to function. You need to create a .env.secret file in the root directory of the project and add these keys.
+This project requires an OpenAI API key and a Flask secret key to function. You need to create a .env.secret file in the root directory of the project and add these keys. The original source code is safetly publish to the dokku environment and will NOT appear in any source code. If you would like to use this on your personal computer, please set your own unique Flask Key and OpenAI API Key.
 
 Create a .env.secret file in the project root directory: touch .env.secret
 
@@ -224,9 +224,12 @@ Open the .env.secret file and add the following lines, replacing your_openai_api
 
 After setting up the environment variables, you can run the project using the following commands:
 
+To populate the database (if applicable): pixi run populate
+
 To start the server: pixi run server
 
-To populate the database (if applicable): pixi run populate
+## Deploy to Dokku
+All the files set in this repository are file ready to be deployed to dokku as all configurations have been made to make it successful. In order
 
 ## Contributing
 

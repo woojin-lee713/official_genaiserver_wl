@@ -1,0 +1,223 @@
+{% extends 'layout.html' %} {% block body %}
+<div class="container-fluid page-transition" id="pageTransitionContainer">
+    <div class="row" style="height: 90vh; overflow: hidden">
+        <!-- Left Content -->
+        <div
+            class="col-md-7 d-flex flex-column justify-content-center align-items-start left-section"
+        >
+            <div class="text-start px-5">
+                <div class="typewriter">
+                    <p id="typewriter-text" class="typewriter-text"></p>
+                </div>
+                <p id="assistant-text" class="assistant-text">
+                    How can I assist you today?
+                </p>
+            </div>
+        </div>
+        <!-- Right Content -->
+        <div
+            class="col-md-5 d-flex flex-column justify-content-center align-items-center right-section"
+        >
+            <div class="text-center">
+                <h2 class="mb-4" style="color: white">Get started</h2>
+                <div class="button-container d-flex justify-content-center">
+                    <a href="/login" class="btn btn-lg btn-gradient mx-2"
+                        >Log in</a
+                    >
+                    <a href="/register" class="btn btn-lg btn-gradient mx-2"
+                        >Sign up</a
+                    >
+                </div>
+            </div>
+            <div
+                class="footer"
+                style="
+                    position: absolute;
+                    bottom: 5px;
+                    width: 100%;
+                    text-align: center;
+                "
+            >
+                <p style="font-size: small; color: white; margin-bottom: 2px">
+                    &copy;
+                    <a href="/about" style="color: white; text-decoration: none"
+                        >2024 EllishGPT inc. All rights reserved.</a
+                    >
+                </p>
+                <p style="font-size: small; color: white; margin-top: 2px">
+                    Team Members: Woo Jin Lee, Carla Sofia Ramirez Gonzalez &
+                    Zane Malik
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .left-section {
+        background: linear-gradient(135deg, #1e3c72, #2a5298, #72a0c1, #a6dcef);
+        background-size: 400% 400%;
+        animation: gradient 10s ease infinite;
+        color: white;
+    }
+
+    .right-section {
+        background: #000;
+        color: white;
+    }
+
+    .typewriter-text {
+        font-family: "Segoe UI", sans-serif;
+        font-size: 80px;
+        font-weight: bold; /* Make hello text bold */
+        color: white;
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 0.05em solid white;
+    }
+
+    .assistant-text {
+        font-family: "Segoe UI", sans-serif;
+        font-size: 30px; /* Make the font smaller */
+        color: white;
+        margin-top: 1px; /* Reduce space between texts */
+        opacity: 1;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition:
+            background 0.2s,
+            transform 0.2s;
+        display: block;
+        width: 150px;
+        margin: 10px;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a77d1, #8655c5);
+        transform: translateY(-2px);
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .page-transition {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .page-transition.fade-in {
+        opacity: 1;
+    }
+
+    .page-transition.fade-out {
+        opacity: 0;
+    }
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    @keyframes typing {
+        from {
+            width: 0;
+        }
+        to {
+            width: 100%;
+        }
+    }
+
+    @keyframes blink-caret {
+        from,
+        to {
+            border-color: transparent;
+        }
+        50% {
+            border-color: white;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pageTransitionContainer = document.getElementById(
+            "pageTransitionContainer",
+        );
+        setTimeout(() => {
+            pageTransitionContainer.classList.add("fade-in");
+        }, 100);
+
+        document.querySelectorAll("a").forEach(function (anchor) {
+            anchor.addEventListener("click", function (event) {
+                event.preventDefault();
+                let linkLocation = this.href;
+                pageTransitionContainer.classList.remove("fade-in");
+                pageTransitionContainer.classList.add("fade-out");
+                setTimeout(function () {
+                    window.location = linkLocation;
+                }, 1000);
+            });
+        });
+
+        const texts = [
+            "Hello",
+            "Hola",
+            "Bonjour",
+            "Hallo",
+            "Ciao",
+            "こんにちは",
+            "안녕하세요",
+            "你好",
+            "Привет",
+            "مرحبا",
+            "Olá",
+            "Salam",
+            "Shalom",
+            "Merhaba",
+            "Kumusta",
+            "Sawubona",
+            "Selamat pagi",
+            "Bula",
+            "Hei",
+        ];
+        let textIndex = 0;
+        const typewriterText = document.getElementById("typewriter-text");
+        typewriterText.textContent = texts[textIndex]; // Display the first text immediately
+
+        function typeText() {
+            setTimeout(() => {
+                textIndex = (textIndex + 1) % texts.length;
+                typewriterText.style.animation = "none"; // Reset animation
+                typewriterText.textContent = texts[textIndex]; // Set new text
+                setTimeout(() => {
+                    typewriterText.style.animation =
+                        "typing 2s steps(" +
+                        texts[textIndex].length +
+                        ", end) forwards, blink-caret 0.75s step-end infinite";
+                    setTimeout(typeText, 4000); // Schedule next update
+                }, 0); // Immediate start of animation
+            }, 4000); // Time before starting the typewriting effect for the next text
+        }
+
+        setTimeout(typeText, 500); // Initial delay before starting the first text
+    });
+</script>
+{% endblock %}

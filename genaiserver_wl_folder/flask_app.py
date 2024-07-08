@@ -57,7 +57,7 @@ def create_app():
     def login_required(f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            if 'logged_in' in session:
+            if 'logged_in' in session and session['logged_in']:
                 return f(*args, **kwargs)
             else:
                 flash('You need to login first.')
@@ -71,8 +71,17 @@ def create_app():
         return stored_password == hash_password(provided_password)
 
     @app.route("/")
+    def loading():
+        return render_template("loading.html", app_data=app_data)
+
+    @app.route("/index")
     def index():
-        return render_template("index.html", app_data=app_data)
+        logged_in = session.get('logged_in', False)
+        print(f"Debug: User logged_in status is {logged_in}")
+        if logged_in:
+            return render_template("index2.html", app_data=app_data)
+        else:
+            return render_template("index1.html", app_data=app_data)
 
     @app.route("/about")
     def about():
@@ -83,7 +92,11 @@ def create_app():
     def chat():
         try:
             db = get_db()
-            username = session['username']
+            username = session.get('username')
+            if not username:
+                flash("User not logged in.")
+                return redirect(url_for('index'))
+
             cur = db.execute('SELECT userid FROM users WHERE username = ?', (username,))
             result = cur.fetchone()
 
@@ -91,23 +104,29 @@ def create_app():
                 flash("User not found.")
                 return redirect(url_for('index'))
 
-            user_id = result[0]
+            user_id = result['userid']
 
             cur = db.execute('SELECT modelid, modelname FROM models')
-            models = [{'modelid': row[0], 'modelname': row[1]} for row in cur.fetchall()]
+            models = [{'modelid': row['modelid'], 'modelname': row['modelname']} for row in cur.fetchall()]
 
             if request.method == 'POST':
-                chat = request.form['chat']
-                title = request.form['title']
-                model_id = request.form['model_id']
-                model_name = next((model['modelname'] for model in models if model['modelid'] == int(model_id)), 'Unknown')
+                chat = request.form.get('chat')
+                title = request.form.get('title')
+                model_id = request.form.get('model_id')
+                if model_id is not None:
+                    model_id = int(model_id)
+                else:
+                    flash("Model ID is required.")
+                    return redirect(url_for('chat'))
+
+                model_name = next((model['modelname'] for model in models if model['modelid'] == model_id), 'Unknown')
                 thetime = datetime.now()
                 db.execute('INSERT INTO chats (user_id, model_id, title, chat, time, model_name) VALUES (?, ?, ?, ?, ?, ?)',
                            (user_id, model_id, title, chat, thetime, model_name))
                 db.commit()
 
             cur2 = db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
-            chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0], model_name=row[6]) for row in cur2.fetchall()]
+            chats = [dict(time=row['time'], chat=row['chat'], title=row['title'], chat_id=row['chat_id'], model_name=row['model_name']) for row in cur2.fetchall()]
             if not chats:
                 chats = []  # Ensure chats is an empty list if no chats are found
 
@@ -122,9 +141,18 @@ def create_app():
     def open_chat(chat_id):
         try:
             db = get_db()
-            username = session['username']
+            username = session.get('username')
+            if not username:
+                flash("User not logged in.")
+                return redirect(url_for('index'))
+
             cur = db.execute('SELECT userid FROM users WHERE username = ?', (username,))
-            user_id = cur.fetchone()[0]
+            result = cur.fetchone()
+            if result is None:
+                flash("User not found.")
+                return redirect(url_for('index'))
+
+            user_id = result['userid']
 
             cur = db.execute('SELECT * FROM chats WHERE chat_id = ?', (chat_id,))
             chat = cur.fetchone()
@@ -134,10 +162,10 @@ def create_app():
                 flash("Chat not found.")
                 return redirect(url_for('chat'))
 
-            chat_data = dict(time=chat[5], chat=chat[4], title=chat[3], chat_id=chat[0], model_name=chat[6])
+            chat_data = dict(time=chat['time'], chat=chat['chat'], title=chat['title'], chat_id=chat['chat_id'], model_name=chat['model_name'])
 
             cur_messages = db.execute('SELECT sender, message FROM chat_messages WHERE chat_id = ? ORDER BY timestamp DESC LIMIT 10', (chat_id,))
-            messages = [{'sender': row[0], 'message': row[1]} for row in cur_messages.fetchall()]
+            messages = [{'sender': row['sender'], 'message': row['message']} for row in cur_messages.fetchall()]
             messages.reverse()  # Reverse to show the latest message at the bottom
 
             if request.method == 'POST':
@@ -155,7 +183,7 @@ def create_app():
                 messages.append({'sender': 'Ellish', 'message': bot_response})
 
             cur2 = db.execute('SELECT * FROM chats WHERE user_id = ? ORDER BY time;', (user_id,))
-            chats = [dict(time=row[5], chat=row[4], title=row[3], chat_id=row[0], model_name=row[6]) for row in cur2.fetchall()]
+            chats = [dict(time=row['time'], chat=row['chat'], title=row['title'], chat_id=row['chat_id'], model_name=row['model_name']) for row in cur2.fetchall()]
 
             return render_template("chat_detail.html", app_data=app_data, chat=chat_data, messages=messages, chats=chats)
         except Exception as e:
@@ -172,10 +200,14 @@ def create_app():
         try:
             db = get_db()
             cur = db.execute('SELECT model_name FROM chats WHERE chat_id = ?', (chat_id,))
-            model_name = cur.fetchone()[0]
+            result = cur.fetchone()
+            if result is None:
+                return jsonify({"error": "Chat not found"}), 404
+
+            model_name = result['model_name']
 
             cur_context = db.execute('SELECT sender, message FROM chat_messages WHERE chat_id = ? ORDER BY timestamp DESC LIMIT 6', (chat_id,))
-            context_messages = [{'sender': row[0], 'message': row[1]} for row in cur_context.fetchall()]
+            context_messages = [{'sender': row['sender'], 'message': row['message']} for row in cur_context.fetchall()]
             context_messages.reverse()  # Reverse to maintain order
 
             context_prompt = "\n".join([f"{msg['sender']}: {msg['message']}" for msg in context_messages])
@@ -202,15 +234,31 @@ def create_app():
         if not data or 'model_id' not in data or 'title' not in data:
             return jsonify({"error": "Invalid data"}), 400
 
-        username = session['username']
+        username = session.get('username')
+        if not username:
+            return jsonify({"error": "User not logged in"}), 403
+
         db = get_db()
         cur = db.execute('SELECT userid FROM users WHERE username = ?', (username,))
-        user_id = cur.fetchone()[0]
+        result = cur.fetchone()
+        if result is None:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = result['userid']
 
         chat = data.get('chat', '')
         model_id = data['model_id']
+        if model_id is not None:
+            model_id = int(model_id)
+        else:
+            return jsonify({"error": "Model ID is required"}), 400
+
         cur = db.execute('SELECT modelname FROM models WHERE modelid = ?', (model_id,))
-        model_name = cur.fetchone()[0]
+        result = cur.fetchone()
+        if result is None:
+            return jsonify({"error": "Model not found"}), 404
+
+        model_name = result['modelname']
 
         create_new_chat(user_id, model_id, data['title'], chat, model_name)
         return jsonify({"message": "Chat created successfully"}), 200

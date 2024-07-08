@@ -6,10 +6,11 @@
     <div class="container">
         <a
             class="navbar-brand"
-            href="/"
+            href="/index"
             style="color: white; font-family: &quot;Pacifico&quot;, cursive"
-            >{{ app_data['project_name'] }}</a
         >
+            {{ app_data['project_name'] }}
+        </a>
         <button
             class="navbar-toggler"
             type="button"
@@ -22,11 +23,13 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto" style="margin-left: auto">
+            <ul class="navbar-nav ml-auto">
                 <li
                     class="nav-item {% if request.path == '/' %}active{% endif %}"
                 >
-                    <a class="nav-link" href="/" style="color: white">Home</a>
+                    <a class="nav-link" href="/index" style="color: white"
+                        >Home</a
+                    >
                 </li>
                 <li
                     class="nav-item {% if request.path == '/about' %}active{% endif %}"
@@ -42,7 +45,7 @@
                         >Chat</a
                     >
                 </li>
-                {% if "logged_in" not in session %}
+                {% if not session.get('logged_in') %}
                 <li
                     class="nav-item {% if request.path == '/login' %}active{% endif %}"
                 >
@@ -67,7 +70,7 @@
                 </li>
                 {% endif %}
             </ul>
-            {% if "logged_in" in session %}
+            {% if session.get('logged_in') %}
             <span class="navbar-text" style="margin-left: 50px; color: white"
                 >Welcome, {{ session['username'] }}</span
             >
@@ -75,3 +78,12 @@
         </div>
     </div>
 </nav>
+
+<!-- Include Bootstrap CSS and JavaScript -->
+<link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+/>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
