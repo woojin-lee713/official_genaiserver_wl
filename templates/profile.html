@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>User Profile</title>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        {% extends 'layout.html' %} {% block body %}
+        <div
+            class="container-fluid page-transition"
+            id="pageTransitionContainer"
+            style="
+                background-color: black;
+                min-height: 100vh;
+                padding-top: 100px;
+            "
+        >
+            <div class="alert-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %} {% endif %} {% endwith %}
+            </div>
+            <div class="row py-5 text-center">
+                <div class="col-12">
+                    <h1
+                        style="
+                            color: white;
+                            font-weight: bold;
+                            font-family: &quot;Raleway&quot;, sans-serif;
+                        "
+                    >
+                        User Profile
+                    </h1>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <!-- User Profile Picture -->
+                    <img
+                        src="{{ url_for('static', filename='profile_pictures/' + profile_picture) }}"
+                        alt="User Profile Picture"
+                        class="rounded-circle img-fluid"
+                        style="
+                            width: 150px;
+                            height: 150px;
+                            object-fit: cover;
+                            border: 2px solid #ffffff;
+                        "
+                        onerror="this.onerror=null;this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';"
+                    />
+                    <h2
+                        class="my-3"
+                        style="
+                            color: white;
+                            font-family: &quot;Raleway&quot;, sans-serif;
+                        "
+                    >
+                        {{ session['username'] if 'username' in session else
+                        'Guest' }}
+                    </h2>
+                </div>
+            </div>
+            <div class="row justify-content-center py-5">
+                <div class="col-md-8 text-center">
+                    <div class="row">
+                        <div class="col-md-6 text-start">
+                            <h2
+                                class="my-4"
+                                style="
+                                    color: white;
+                                    font-family: &quot;Raleway&quot;, sans-serif;
+                                "
+                            >
+                                Profile Information
+                            </h2>
+                            <p style="color: white">Email: {{ email }}</p>
+                            <p style="color: white">
+                                Joined Date: {{ joined_date }} UTC
+                            </p>
+                        </div>
+                        <div class="col-md-6 d-grid gap-3 text-center">
+                            <a href="/export" class="btn btn-gradient"
+                                >Export Chat</a
+                            >
+                            <a href="/update-profile" class="btn btn-gradient"
+                                >Update Profile</a
+                            >
+                            <a href="/logout" class="btn btn-gradient"
+                                >Log Out</a
+                            >
+                            <a
+                                href="#"
+                                class="delete-profile-link"
+                                id="deleteProfileLink"
+                                >Delete Profile</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container text-center mt-5">
+                <p style="color: white">
+                    &copy; 2024 EllishGPT Inc. All rights reserved.
+                </p>
+            </div>
+        </div>
+
+        <style>
+            body {
+                background-color: black;
+                opacity: 1;
+                transition: opacity 0.5s ease-in-out;
+            }
+            body.fade-out {
+                opacity: 0;
+            }
+            .btn-gradient {
+                background: linear-gradient(135deg, #6e8efb, #a777e3);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                padding: 10px 20px;
+                font-size: 16px;
+                transition:
+                    background 0.2s,
+                    transform 0.2s;
+            }
+            .btn-gradient:hover {
+                background: linear-gradient(135deg, #5a77d1, #8655c5);
+                transform: translateY(-2px);
+            }
+            .delete-profile-link {
+                color: #6e8efb;
+                text-decoration: none;
+            }
+            .delete-profile-link:hover {
+                text-decoration: underline;
+            }
+            .page-transition {
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
+            }
+            .page-transition.fade-in {
+                opacity: 1;
+            }
+            .page-transition.fade-out {
+                opacity: 0;
+            }
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+            .modal-content {
+                background: #1e3c72;
+                padding: 30px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                max-width: 400px;
+                width: 90%;
+                transition: opacity 0.5s ease-in-out;
+            }
+            .modal-content p {
+                margin-bottom: 20px;
+                color: white;
+                font-family: "Raleway", sans-serif;
+                font-size: 18px;
+            }
+            .modal-content .btn {
+                margin: 0 10px;
+                margin-top: 10px;
+            }
+            .modal-content .btn-cancel {
+                background: #ccc;
+                color: #333;
+                border: none;
+                border-radius: 25px;
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            .modal-content .btn-cancel:hover {
+                background: #bbb;
+            }
+            .delete-message {
+                color: white;
+                font-size: 24px;
+                text-align: center;
+            }
+            .alert-container {
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                width: 300px;
+                z-index: 1050;
+            }
+            .alert {
+                margin-bottom: 15px;
+                animation:
+                    slideIn 0.5s ease,
+                    fadeOut 0.5s ease 2.5s forwards;
+            }
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+        </style>
+
+        <div class="modal-overlay" id="deleteProfileModal">
+            <div class="modal-content">
+                <p>
+                    Are you sure you want to delete your profile? This action
+                    cannot be undone.
+                </p>
+                <button class="btn btn-gradient btn-confirm">Yes</button>
+                <button class="btn btn-cancel">No</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="deleteMessageModal">
+            <div class="modal-content">
+                <p class="delete-message" id="deleteMessage">
+                    We are sorry for you to go.
+                </p>
+                <p>Account Successfully Deleted.</p>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const pageTransitionContainer = document.getElementById(
+                    "pageTransitionContainer",
+                );
+                const deleteProfileLink =
+                    document.getElementById("deleteProfileLink");
+                const deleteProfileModal =
+                    document.getElementById("deleteProfileModal");
+                const deleteMessageModal =
+                    document.getElementById("deleteMessageModal");
+                const btnConfirm = document.querySelector(".btn-confirm");
+                const btnCancel = document.querySelector(".btn-cancel");
+
+                setTimeout(() => {
+                    pageTransitionContainer.classList.add("fade-in");
+                }, 100);
+
+                deleteProfileLink.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    deleteProfileModal.style.display = "flex";
+                });
+
+                btnConfirm.addEventListener("click", function () {
+                    deleteProfileModal.style.opacity = "0";
+                    setTimeout(() => {
+                        deleteProfileModal.style.display = "none";
+                        deleteMessageModal.style.display = "flex";
+                        deleteMessageModal.style.opacity = "1";
+                        setTimeout(() => {
+                            window.location.href =
+                                "{{ url_for('delete_profile') }}";
+                        }, 2000); // Delay to show the message before redirect
+                    }, 500);
+                });
+
+                btnCancel.addEventListener("click", function () {
+                    deleteProfileModal.style.opacity = "0";
+                    setTimeout(() => {
+                        deleteProfileModal.style.display = "none";
+                        deleteProfileModal.style.opacity = "1";
+                    }, 500);
+                });
+
+                document.querySelectorAll("a").forEach(function (anchor) {
+                    anchor.addEventListener("click", function (event) {
+                        if (!this.id.includes("deleteProfileLink")) {
+                            event.preventDefault();
+                            let linkLocation = this.href;
+                            pageTransitionContainer.classList.remove("fade-in");
+                            pageTransitionContainer.classList.add("fade-out");
+                            setTimeout(function () {
+                                window.location = linkLocation;
+                            }, 1000);
+                        }
+                    });
+                });
+
+                // Hide flash messages after 3 seconds
+                const alertContainer =
+                    document.querySelector(".alert-container");
+                if (alertContainer) {
+                    setTimeout(() => {
+                        alertContainer.style.display = "none";
+                    }, 3000); // Hide after 3 seconds
+                }
+            });
+        </script>
+        {% endblock %}
+    </body>
+</html>

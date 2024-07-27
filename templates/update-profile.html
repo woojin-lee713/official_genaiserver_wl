@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #000000, #000000);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container-fluid {
+            opacity: 0;
+            transform: translateY(-100px);
+            animation: slideIn 1s ease forwards, fadeIn 2s ease-in-out forwards;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 80px; /* Add margin to push content below the navbar */
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .profile-pic-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 30px;
+            margin-bottom: 5px;
+        }
+
+        .profile-pic-container img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 2px solid #ffffff; /* Pure white border */
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 50%;
+        }
+
+        .profile-pic-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .profile-info {
+            color: #fff;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .profile-info span {
+            margin: 0 10px;
+        }
+
+        .form-control {
+            border-radius: 50px;
+            padding: 10px;
+            border: 1px solid #333;
+            background-color: transparent;
+            color: white;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: #6e8efb;
+            background-color: white;
+            color: black;
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: background 0.2s, transform 0.2s;
+            display: block;
+            width: 150px;
+            margin: 10px auto;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #5a77d1, #8655c5);
+            transform: translateY(-2px);
+        }
+
+        .btn-dimmed {
+            background: none;
+            color: red;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            display: block;
+            width: 150px;
+            margin: 10px auto;
+            transition: transform 0.2s, opacity 0.2s;
+            opacity: 0.7;
+        }
+
+        .btn-dimmed:hover {
+            transform: translateY(-2px);
+            opacity: 1;
+        }
+
+        .links {
+            font-size: small;
+            color: white;
+            opacity: 0.7;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 5px;
+            transition: color 0.2s;
+        }
+
+        .links a:hover {
+            color: #6e8efb;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.7;
+            margin-top: 30px;
+        }
+
+        .neon-text {
+            color: #fff;
+            text-shadow: 0 0 5px #6e8efb, 0 0 10px #6e8efb, 0 0 20px #6e8efb, 0 0 40px #6e8efb, 0 0 80px #6e8efb;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0.6;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            width: 150px;
+            text-align: right;
+            margin-right: 20px;
+        }
+
+        .form-group input {
+            max-width: 300px;
+        }
+
+        .form-group-inline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group-inline label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            width: 150px;
+            text-align: right;
+            margin-right: 20px;
+        }
+
+        .form-group-inline input {
+            max-width: 300px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            margin-bottom: 10px;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        .alert-container {
+            position: fixed;
+            top: 80px; /* Ensure the alert is below the navbar */
+            right: 10px; /* Adjust this value to move it closer to the edge */
+            width: 250px; /* Make the alert smaller */
+            z-index: 1050;
+        }
+
+        .alert {
+            margin-bottom: 10px; /* Adjust the margin between alerts */
+            animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+            font-size: 0.875rem; /* Make the alert text smaller */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .alert-danger {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .alert-container {
+                width: 90%;
+                right: 5%;
+            }
+
+            .profile-info {
+                font-size: 1.5rem;
+            }
+
+            .profile-pic-container img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .form-group label {
+                width: 80px;
+                font-size: 0.9rem;
+            }
+
+            .form-group input {
+                max-width: 250px;
+            }
+
+            .form-group-inline label {
+                width: 80px;
+                font-size: 0.9rem;
+            }
+
+            .form-group-inline input {
+                max-width: 250px;
+            }
+
+            .btn-gradient,
+            .btn-dimmed {
+                width: 120px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .container-fluid {
+                margin-top: 100px; /* Ensure enough space below the navbar */
+            }
+
+            .profile-pic-container img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .profile-info {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% extends 'layout.html' %} {% block body %}
+    <div class="alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container-fluid position-relative">
+        <div class="row justify-content-center align-items-center" style="margin-top: 30px">
+            <div class="col-md-6 text-center">
+                <h1 style="
+                    color: white;
+                    font-weight: bold;
+                    font-family: &quot;Raleway&quot;, sans-serif;"
+                >
+                    Update User Profile</h1>
+                <div class="profile-pic-container">
+                    <img src="{{ url_for('static', filename='profile_pictures/' + profile_picture) }}" alt="Profile Picture"
+                        class="rounded-circle img-fluid" onerror="this.onerror=null; this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';" />
+                </div>
+                <div class="profile-info mt-3">
+                    <span class="neon-text">{{ first_name }}</span>
+                    <span class="neon-text">{{ last_name }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center align-items-start mt-4">
+            <div class="col-md-8">
+                <form id="update-profile-form" action="{{ url_for('update_profile') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group fade-in">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Username" name="username"
+                            value="{{ username }}" required readonly
+                            onclick="this.removeAttribute('readonly'); this.value = '';"
+                            onblur="restoreOriginalText(this, '{{ username }}')" />
+                    </div>
+                    <div class="form-group fade-in">
+                        <label id="password-label" for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password" name="password"
+                            value="********" required readonly
+                            onclick="this.removeAttribute('readonly'); this.value = ''; showPasswordReentry();"
+                            onblur="restorePasswordField(this, '********')" />
+                    </div>
+                    <div class="form-group-inline fade-in" id="reenter-password" style="display: none">
+                        <label for="reenter_password">Re-enter Password</label>
+                        <input type="password" class="form-control" id="reenter_password" placeholder="New Password"
+                            name="reenter_password" />
+                    </div>
+                    <div class="form-group fade-in">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Email" name="email"
+                            value="{{ email }}" required readonly
+                            onclick="this.removeAttribute('readonly'); this.value = '';"
+                            onblur="restoreOriginalText(this, '{{ email }}')" />
+                    </div>
+                    <div class="form-actions fade-in">
+                        <button class="btn btn-gradient" type="submit" form="update-profile-form">Save & Exit</button>
+                        <a href="/profile" class="btn btn-dimmed">Exit</a>
+                        <div class="links">
+                            <a href="/about">About</a> |
+                            <a href="/privacy">Privacy and Security</a>
+                        </div>
+                    </form>
+            </div>
+        </div>
+        <div class="footer">
+            <br>
+            <p>&copy; 2024 EllishGPT Inc. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        function showPasswordReentry() {
+            document.getElementById("reenter-password").style.display = "flex";
+            document.getElementById("password-label").innerText = "New Password";
+        }
+
+        function restorePasswordField(input, originalText) {
+            if (input.value.trim() === "") {
+                input.value = originalText;
+                input.setAttribute("readonly", "readonly");
+                document.getElementById("reenter-password").style.display = "none";
+                document.getElementById("password-label").innerText = "Password";
+            }
+        }
+
+        function restoreOriginalText(input, originalText) {
+            if (input.value.trim() === "") {
+                input.value = originalText;
+                input.setAttribute("readonly", "readonly");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                const alertContainer = document.querySelector('.alert-container');
+                if (alertContainer) {
+                    alertContainer.style.display = 'none';
+                }
+            }, 3000);
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% endblock %}
+</body>
+</html>

@@ -6,7 +6,7 @@
     <div class="container">
         <a
             class="navbar-brand"
-            href="/index"
+            href="/home"
             style="color: white; font-family: &quot;Pacifico&quot;, cursive"
         >
             {{ app_data['project_name'] }}
@@ -27,7 +27,7 @@
                 <li
                     class="nav-item {% if request.path == '/' %}active{% endif %}"
                 >
-                    <a class="nav-link" href="/index" style="color: white"
+                    <a class="nav-link" href="/home" style="color: white"
                         >Home</a
                     >
                 </li>
@@ -72,7 +72,9 @@
             </ul>
             {% if session.get('logged_in') %}
             <span class="navbar-text" style="margin-left: 50px; color: white"
-                >Welcome, {{ session['username'] }}</span
+                ><a href="/profile" style="color: white"
+                    >Welcome, {{ session['username'] }}</a
+                ></span
             >
             {% endif %}
         </div>

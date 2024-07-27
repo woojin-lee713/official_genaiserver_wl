@@ -2,8 +2,8 @@ import sys
 import os
 import sqlite3
 from datetime import datetime
-import hashlib
 import logging
+from werkzeug.security import generate_password_hash
 
 # Add the project's root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,12 +19,9 @@ def convert_datetime(s):
 sqlite3.register_adapter(datetime, adapt_datetime)
 sqlite3.register_converter("timestamp", convert_datetime)
 
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
-
 def get_db(dbfile: str) -> sqlite3.Connection:
     "Get a connection to the database"
-    if not os.path.exists(os.path.dirname(dbfile)):
+    if not os.path.exists(os.path.dirname(dbfile)) and os.path.dirname(dbfile) != "":
         os.makedirs(os.path.dirname(dbfile))
     db = sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES)
     db.row_factory = sqlite3.Row
@@ -36,7 +33,7 @@ def unget_db(db: sqlite3.Connection):
 
 def initialize_database(dbfile: str):
     try:
-        if dbfile == "":
+        if not dbfile:
             raise ValueError("Database file path is empty")
         if not os.path.exists(os.path.dirname(dbfile)) and os.path.dirname(dbfile) != "":
             os.makedirs(os.path.dirname(dbfile))
@@ -48,7 +45,12 @@ def initialize_database(dbfile: str):
             CREATE TABLE IF NOT EXISTS users (
                 userid INTEGER PRIMARY KEY,
                 username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                first_name TEXT NOT NULL DEFAULT 'John',
+                last_name TEXT NOT NULL DEFAULT 'Doe',
+                profile_picture TEXT NOT NULL DEFAULT 'default.png'
             )
             ''')
 
@@ -87,11 +89,13 @@ def initialize_database(dbfile: str):
             )
             ''')
 
-            hashed_admin_password = hash_password('admin')
-            hashed_example_password = hash_password('example')
+            hashed_admin_password = generate_password_hash('admin')
+            hashed_example_password = generate_password_hash('example')
 
-            c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('admin', hashed_admin_password))
-            c.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('example', hashed_example_password))
+            c.execute('INSERT OR IGNORE INTO users (username, password, email, first_name, last_name, profile_picture) VALUES (?, ?, ?, ?, ?, ?)',
+                      ('admin', hashed_admin_password, 'admin@ellish.com', 'Admin', 'User', 'default.png'))
+            c.execute('INSERT OR IGNORE INTO users (username, password, email, first_name, last_name, profile_picture) VALUES (?, ?, ?, ?, ?, ?)',
+                      ('example', hashed_example_password, 'example@example.com', 'Example', 'User', 'default.png'))
 
             c.execute('SELECT userid FROM users WHERE username = ?', ('example',))
             example_user_id = c.fetchone()[0]
@@ -99,13 +103,15 @@ def initialize_database(dbfile: str):
             c.execute('SELECT userid FROM users WHERE username = ?', ('admin',))
             admin_user_id = c.fetchone()[0]
 
-            c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('None',))
             c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-3.5-turbo',))
             c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-4',))
             c.execute('INSERT OR IGNORE INTO models (modelname) VALUES (?)', ('gpt-4-turbo',))
 
-            c.execute('SELECT modelid FROM models WHERE modelname = ?', ('None',))
-            model_id = c.fetchone()[0]
+            c.execute('SELECT modelid FROM models WHERE modelname = ?', ('gpt-3.5-turbo',))
+            model_id = c.fetchone()
+            if model_id is None:
+                raise ValueError("Model 'gpt-3.5-turbo' not found after insertion.")
+            model_id = model_id[0]
 
             chats = [
                 (example_user_id, model_id, 'Example Chat 1', 'Chat 1 lorem ipsum', datetime.now(), 'gpt-3.5-turbo'),
@@ -139,7 +145,7 @@ def create_new_chat(user_id: int, model_id: int, title: str, chat: str, model_na
         config = get_configs()
         dbfile = config.get("DATABASE_FILE")
 
-        if dbfile is None or dbfile == "":
+        if not dbfile:
             raise ValueError("DATABASE_FILE is not set or is empty in the configuration.")
 
         with sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
@@ -151,6 +157,26 @@ def create_new_chat(user_id: int, model_id: int, title: str, chat: str, model_na
         logging.exception(f"Error creating new chat: {e}")
     except ValueError as ve:
         logging.error(ve)
+
+def get_user_info(username: str):
+    try:
+        config = get_configs()
+        dbfile = config.get("DATABASE_FILE")
+
+        if not dbfile:
+            raise ValueError("DATABASE_FILE is not set or is empty in the configuration.")
+
+        with sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+            conn.row_factory = sqlite3.Row  # Ensure row factory is set
+            c = conn.cursor()
+            c.execute('SELECT email, joined_date, first_name, last_name, profile_picture FROM users WHERE username = ?', (username,))
+            user_info = c.fetchone()
+            return user_info
+    except sqlite3.Error as e:
+        logging.exception(f"Error retrieving user information: {e}")
+    except ValueError as ve:
+        logging.error(ve)
+        return None
 
 if __name__ == "__main__":
     config = get_configs()

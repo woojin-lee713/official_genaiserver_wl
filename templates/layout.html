@@ -27,29 +27,59 @@
             rel="stylesheet"
         />
 
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+
         <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow-x: hidden;
+            }
+
             .navbar-nav .nav-item .nav-link {
                 transition:
                     color 0.3s ease,
                     text-decoration 0.3s ease;
             }
+
             .navbar-nav .nav-item .nav-link:hover {
                 color: #d4d4d4 !important;
             }
+
             .navbar-nav .nav-item.active .nav-link {
                 font-weight: bold;
                 color: #f8f9fa !important;
                 text-decoration: underline !important;
             }
+
             .navbar-nav .nav-item .nav-link {
                 margin-right: 15px;
             }
+
+            .navbar {
+                z-index: 1;
+            }
+
+            main {
+                padding-top: 56px; /* Adjust this value if your navbar height is different */
+                min-height: 100vh;
+            }
         </style>
     </head>
-    <body style="margin: 0; padding: 0">
-        {% include 'includes/_navbar.html' %}
+    <body>
+        {% if not hide_navbar %} {% include 'includes/_navbar.html' %} {% endif
+        %}
 
-        <main role="main" class="container-fluid pt-5 mt-3">
+        <main
+            role="main"
+            class="container-fluid p-0 m-0"
+            style="{% if hide_navbar %}padding-top: 0;{% endif %}"
+        >
             {% block body %}{% endblock %}
         </main>
 

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Home</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@100;400;700&display=swap");
+
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                font-family: "Raleway", sans-serif;
+                background: #121212;
+                overflow: hidden;
+            }
+
+            .container-fluid {
+                height: 100vh;
+                width: 100vw;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
+            }
+
+            .container-fluid.fade-in {
+                opacity: 1;
+            }
+
+            .row {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .left-section {
+                flex: 7;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                padding-left: 50px;
+                background: linear-gradient(
+                    135deg,
+                    #1e3c72,
+                    #2a5298,
+                    #72a0c1,
+                    #a6dcef
+                );
+                background-size: 400% 400%;
+                animation: gradient 10s ease infinite;
+                color: white;
+                text-align: left;
+            }
+
+            .right-section {
+                flex: 5;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                background: #000;
+                color: white;
+            }
+
+            .welcome-text-container {
+                position: relative;
+                height: 80px;
+            }
+
+            .animated-text {
+                font-size: 60px;
+                font-weight: bold;
+                position: absolute;
+                white-space: nowrap;
+                width: 100%;
+                transition: opacity 1s ease-in-out;
+            }
+
+            .fade-out {
+                opacity: 0;
+            }
+
+            .fade-in {
+                opacity: 1;
+            }
+
+            .subtitle {
+                font-size: 20px;
+                color: white;
+                margin-top: 25px;
+                font-weight: normal;
+            }
+
+            .btn-gradient {
+                background: linear-gradient(135deg, #6e8efb, #a777e3);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                padding: 10px 20px;
+                font-size: 16px;
+                transition:
+                    background 0.2s,
+                    transform 0.2s;
+                display: block;
+                width: 150px;
+                margin: 10px;
+                text-align: center;
+                text-decoration: none;
+            }
+
+            .btn-gradient:hover {
+                background: linear-gradient(135deg, #5a77d1, #8655c5);
+                transform: translateY(-2px);
+            }
+
+            .button-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .additional-links {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .small-link {
+                font-size: 12px;
+                color: white;
+                text-decoration: none;
+                margin: 0 5px;
+            }
+
+            .small-link:hover {
+                text-decoration: underline;
+            }
+
+            .page-transition {
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
+            }
+
+            .page-transition.fade-in {
+                opacity: 1;
+            }
+
+            .page-transition.fade-out {
+                opacity: 0;
+            }
+
+            @keyframes gradient {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            .profile-icon {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                color: white;
+                font-size: 24px;
+            }
+
+            .profile-icon i {
+                color: white;
+                font-size: 24px;
+            }
+
+            .profile-icon:hover i {
+                color: #a777e3;
+            }
+        </style>
+    </head>
+    <body>
+        <div
+            class="container-fluid page-transition"
+            id="pageTransitionContainer"
+        >
+            <!-- Profile Icon -->
+            <a href="/profile" class="profile-icon">
+                <i class="fas fa-user"></i>
+            </a>
+            <div class="row">
+                <!-- Left Content -->
+                <div
+                    class="col-md-7 d-flex flex-column justify-content-center align-items-start left-section"
+                >
+                    <div class="text-start px-5">
+                        <div class="welcome-text-container">
+                            <h1 id="welcome-text-1" class="animated-text"></h1>
+                            <h1
+                                id="welcome-text-2"
+                                class="animated-text"
+                                style="opacity: 0"
+                            ></h1>
+                        </div>
+                        <br />
+                        <h2 class="subtitle">
+                            Welcome to your personalized AI chatbot assistant!
+                        </h2>
+                    </div>
+                </div>
+                <!-- Right Content -->
+                <div
+                    class="col-md-5 d-flex flex-column justify-content-center align-items-center right-section"
+                >
+                    <div class="text-center">
+                        <h2
+                            class="mb-4"
+                            style="color: white; text-align: center"
+                        >
+                            Get started
+                        </h2>
+                        <div
+                            class="button-container d-flex justify-content-center"
+                        >
+                            <a href="/login" class="btn btn-gradient mx-2"
+                                >Log in</a
+                            >
+                            <a href="/register" class="btn btn-gradient mx-2"
+                                >Sign up</a
+                            >
+                        </div>
+                        <div class="additional-links mt-4">
+                            <a href="/about" class="small-link">About</a> |
+                            <a href="/privacy" class="small-link"
+                                >Privacy and Security</a
+                            >
+                        </div>
+                    </div>
+                    <div
+                        class="footer"
+                        style="
+                            position: absolute;
+                            bottom: 5px;
+                            width: 100%;
+                            text-align: center;
+                        "
+                    >
+                        <p
+                            style="
+                                font-size: small;
+                                color: white;
+                                margin-top: 2px;
+                            "
+                        >
+                            &copy;
+                            <a
+                                href="/about"
+                                style="color: white; text-decoration: none"
+                            >
+                                2024 EllishGPT inc. All rights reserved.
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const pageTransitionContainer = document.getElementById(
+                    "pageTransitionContainer",
+                );
+                setTimeout(() => {
+                    pageTransitionContainer.classList.add("fade-in");
+                }, 100);
+
+                document.querySelectorAll("a").forEach(function (anchor) {
+                    anchor.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        let linkLocation = this.href;
+                        pageTransitionContainer.classList.remove("fade-in");
+                        pageTransitionContainer.classList.add("fade-out");
+                        setTimeout(function () {
+                            window.location = linkLocation;
+                        }, 1000);
+                    });
+                });
+
+                const helloTexts = [
+                    "Hello!", // English
+                    "Hola!", // Spanish
+                    "Bonjour!", // French
+                    "Hallo!", // German
+                    "Ciao!", // Italian
+                    "こんにちは!", // Japanese
+                    "안녕하세요!", // Korean
+                    "你好!", // Chinese
+                    "Привет!", // Russian
+                    "مرحبا!", // Arabic
+                ];
+
+                let textIndex = 0;
+                const welcomeText1 = document.getElementById("welcome-text-1");
+                const welcomeText2 = document.getElementById("welcome-text-2");
+
+                function changeText() {
+                    const currentText =
+                        textIndex % 2 === 0 ? welcomeText1 : welcomeText2;
+                    const nextText =
+                        textIndex % 2 === 0 ? welcomeText2 : welcomeText1;
+
+                    nextText.textContent = helloTexts[textIndex];
+                    currentText.classList.remove("fade-in");
+                    currentText.classList.add("fade-out");
+
+                    nextText.classList.remove("fade-out");
+                    nextText.classList.add("fade-in");
+
+                    textIndex = (textIndex + 1) % helloTexts.length;
+                }
+
+                // Set initial text
+                welcomeText1.textContent = helloTexts[textIndex];
+                textIndex++;
+                welcomeText2.textContent = helloTexts[textIndex];
+                textIndex++;
+
+                // Change text every 3.5 seconds, with the fade-in starting 0.5 seconds before the fade-out completes
+                setInterval(() => {
+                    changeText();
+                    setTimeout(changeText, 1000); // Change text every 3 seconds
+                }, 5000);
+            });
+        </script>
+    </body>
+</html>

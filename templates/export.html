@@ -1,0 +1,136 @@
+{% extends 'layout.html' %} {% block body %}
+<div
+    class="container-fluid page-transition"
+    id="pageTransitionContainer"
+    style="background-color: black; min-height: 100vh; padding-top: 100px"
+>
+    <div class="row py-5 text-center">
+        <div class="col-12">
+            <h1
+                style="
+                    color: white;
+                    font-weight: bold;
+                    font-family: &quot;Raleway&quot;, sans-serif;
+                "
+            >
+                Export Chats
+            </h1>
+        </div>
+    </div>
+    <div class="row py-5">
+        <div class="col-md-8 offset-md-2">
+            <h2
+                class="my-4 text-center"
+                style="
+                    color: white;
+                    font-family: &quot;Raleway&quot;, sans-serif;
+                "
+            >
+                Select a Chat to Export
+            </h2>
+            <form onsubmit="showMessage(event)">
+                <div class="form-group">
+                    <label for="chat_id" style="color: white">Chat Title</label>
+                    <select class="form-control" id="chat_id" name="chat_id">
+                        {% for chat in chats %}
+                        <option value="{{ chat.chat_id }}">
+                            {{ chat.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-gradient mt-3">
+                    Export to PDF
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: black;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    body.fade-out {
+        opacity: 0;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition:
+            background 0.2s,
+            transform 0.2s;
+        display: block;
+        width: 150px;
+        margin: 10px;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a77d1, #8655c5);
+        transform: translateY(-2px);
+    }
+
+    .page-transition {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .page-transition.fade-in {
+        opacity: 1;
+    }
+
+    .page-transition.fade-out {
+        opacity: 0;
+    }
+
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pageTransitionContainer = document.getElementById(
+            "pageTransitionContainer",
+        );
+        setTimeout(() => {
+            pageTransitionContainer.classList.add("fade-in");
+        }, 100);
+
+        document.querySelectorAll("a").forEach(function (anchor) {
+            anchor.addEventListener("click", function (event) {
+                event.preventDefault();
+                let linkLocation = this.href;
+                pageTransitionContainer.classList.remove("fade-in");
+                pageTransitionContainer.classList.add("fade-out");
+                setTimeout(function () {
+                    window.location = linkLocation;
+                }, 1000);
+            });
+        });
+    });
+
+    function showMessage(event) {
+        event.preventDefault();
+        alert(
+            "Exporting chats will be available with the deployment of EllishGPT1 for secure and copyright purposes.",
+        );
+    }
+</script>
+{% endblock %}

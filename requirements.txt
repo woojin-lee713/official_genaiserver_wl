@@ -7,3 +7,4 @@ pydantic>=2.7.3,<2.8
 openai
 gunicorn
 official-genailib-wl @ https://test-files.pythonhosted.org/packages/90/76/b9403b7696b742ef1a3842ec3980db9f96376cec827a5d6288af591e98cf/official_genailib_wl-1.5.0-py3-none-any.whl
+reportlab>=3.6.12

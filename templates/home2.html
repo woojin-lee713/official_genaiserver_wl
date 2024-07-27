@@ -1,9 +1,18 @@
 {% extends 'layout.html' %} {% block body %}
-<div class="container-fluid page-transition" id="pageTransitionContainer">
-    <div class="row" style="height: 90vh; overflow: hidden">
+<div
+    class="container-fluid page-transition"
+    id="pageTransitionContainer"
+    style="height: 100vh; padding: 0"
+>
+    <!-- Profile Icon -->
+    <a href="/profile" class="profile-icon">
+        <i class="fas fa-user"></i>
+    </a>
+    <div class="row" style="height: 100%; margin: 0">
         <!-- Left Content -->
         <div
             class="col-md-7 d-flex flex-column justify-content-center align-items-start left-section"
+            style="height: 100%; padding: 0"
         >
             <div class="text-start px-5">
                 <div
@@ -44,7 +53,7 @@
                         font-family: &quot;Raleway&quot;, sans-serif;
                         font-size: 40px;
                         color: white;
-                        margin-top: 5px; /* Adjust this value as needed */
+                        margin-top: 5px;
                     "
                 >
                     {{ session['username'] if 'username' in session else 'Guest'
@@ -55,6 +64,7 @@
         <!-- Right Content -->
         <div
             class="col-md-5 d-flex flex-column justify-content-center align-items-center right-section"
+            style="height: 100%; padding: 0"
         >
             <div class="text-center">
                 <h2 class="mb-4" style="color: white">EllishGPT1</h2>
@@ -62,6 +72,14 @@
                     <a href="/chat" class="btn btn-lg btn-gradient mx-2"
                         >Get Started</a
                     >
+                </div>
+                <div class="additional-links mt-4">
+                    <a href="/about" class="small-link">About</a> |
+                    <a href="/privacy" class="small-link"
+                        >Privacy and Security</a
+                    >
+                    |
+                    <a href="/logout" class="small-link">Log out</a>
                 </div>
             </div>
             <div
@@ -73,15 +91,11 @@
                     text-align: center;
                 "
             >
-                <p style="font-size: small; color: white; margin-bottom: 2px">
+                <p style="font-size: small; color: white; margin-top: 2px">
                     &copy;
                     <a href="/about" style="color: white; text-decoration: none"
                         >2024 EllishGPT inc. All rights reserved.</a
                     >
-                </p>
-                <p style="font-size: small; color: white; margin-top: 2px">
-                    Team Members: Woo Jin Lee, Carla Sofia Ramirez Gonzalez &
-                    Zane Malik
                 </p>
             </div>
         </div>
@@ -131,6 +145,21 @@
         justify-content: center;
     }
 
+    .additional-links {
+        margin-top: 20px;
+    }
+
+    .small-link {
+        font-size: 12px; /* Make the font size smaller */
+        color: white;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+
+    .small-link:hover {
+        text-decoration: underline; /* Optional: add underline on hover */
+    }
+
     .page-transition {
         opacity: 0;
         transition: opacity 1s ease-in-out;
@@ -170,6 +199,24 @@
         100% {
             background-position: 0% 50%;
         }
+    }
+
+    .profile-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        color: white;
+        font-size: 24px;
+    }
+
+    .profile-icon i {
+        color: white;
+        font-size: 24px;
+    }
+
+    .profile-icon:hover i {
+        color: #a777e3;
     }
 </style>
 
