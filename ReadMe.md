@@ -1,7 +1,7 @@
 -------------------------------------------------------
 # OpenAI Ellish Chatbot Documentation and Instructions of Use
 
-Created By: Woo Jin Lee, Carla Sofia Ramirez Gonzalez, Zane Malik
+Created By: Woo Jin Lee, Regina Garfias, Daniil Rusanyuk
 
 ## License
 
